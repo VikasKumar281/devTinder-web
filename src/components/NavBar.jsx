@@ -22,6 +22,7 @@ const NavBar = () => {
       }
       catch(err){
        //Error Logic maybe redirect to error page
+       console.error(err);
       }
   }
 
@@ -49,7 +50,7 @@ const NavBar = () => {
                 </Link>
               </li>
               <li>
-                <a>Settings</a>
+                <Link to='/connections'>Connections</Link>
               </li>
               <li>
                 <a onClick={handleLogout}>Logout</a>
