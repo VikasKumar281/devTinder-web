@@ -3,17 +3,18 @@ import { BASE_URL } from "../utils/constants";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
+import { Link } from "react-router-dom";
 
 const Connections = () => {
     const connections = useSelector((store) => store.connections);
-    console.log(connections);
+    // console.log(connections);
     const dispatch = useDispatch();
     const fetchConnections = async () => {
         try{
             const res = await axios.get(BASE_URL + "/user/connections" ,{
                 withCredentials:true,
             });
-            console.log(res?.data?.data);
+            // console.log(res?.data?.data);
             dispatch(addConnections(res?.data?.data));
         }
         catch(err){
@@ -44,7 +45,8 @@ const Connections = () => {
           return(
             <div
               key={_id} 
-              className="flex m-4 p-4 rounded-lg bg-base-200 w-1/2 mx-auto">
+              className="flex m-4 p-4 rounded-lg bg-base-200 w-1/2 mx-auto justify-between items-center">
+              <div className="flex">
                 <div>
                     <img alt="photo"
                      className="w-25 h- rounded-xs "
@@ -56,6 +58,10 @@ const Connections = () => {
                     {age && gender &&<p>{age + " , " + gender}</p>}
                     <p>{about}</p>
                 </div>
+              </div>
+              <Link to ={"/chat/" + _id}>
+                <button className="btn btn-primary ">Chat</button>
+              </Link>
             </div>
         )})}
     </div>

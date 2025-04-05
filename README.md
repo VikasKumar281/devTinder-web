@@ -31,3 +31,15 @@
 - Send Ignore/Interested request to the user from the feed 
 - SignUp the New User
 - Final testing 
+
+
+
+# Real Time Chat using Websocket(Socket.io) =>
+
+   - Build the UI for a chat window on /chat/:targetUserId 
+   - Setup socket.io in backend
+   - npm i socket.io
+   - Setup Frontend socket.io-client
+   - Initialise the chat
+   - Create Socket Connection
+   - Listen to events 

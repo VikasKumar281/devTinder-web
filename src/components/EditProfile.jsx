@@ -32,10 +32,11 @@ const EditProfile = ({ user }) => {
           age,
           gender,
           about,
+          skills,
         },
         { withCredentials: true }
       );
-      console.log(res.data);
+      // console.log(res.data);
       dispatch(addUser(res?.data));
       setShowToast(true);
       setTimeout(() => {
