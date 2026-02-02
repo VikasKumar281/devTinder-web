@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-
+ console.log("BASE_URL =", BASE_URL);
 const Login = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -28,6 +28,7 @@ const Login = () => {
         { withCredentials: true }
       );
       dispatch(addUser(response.data));
+     
       return navigate("/");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong!!");

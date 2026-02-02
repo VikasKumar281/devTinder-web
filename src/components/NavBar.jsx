@@ -37,7 +37,7 @@ const NavBar = () => {
           <div className="dropdown dropdown-end mx-5 flex">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full">
-                <img alt="user photo" src={user.photoUrl} />
+                <img alt="user photo" src={user?.photoUrl || "/Default_user.png"} />
               </div>
             </div>
             <ul

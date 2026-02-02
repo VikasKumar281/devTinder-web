@@ -102,7 +102,6 @@ const Chat = () => {
                  </div> */}
                  <div className="chat-header">
                 {`${msg.firstName}  ${msg.lastName}`}
-                 <time className="text-xs opacity-50">12:45</time>
                  </div>
                  <div className="chat-bubble">{msg.text}</div>
                  <div className="chat-footer opacity-50">Delivered</div>

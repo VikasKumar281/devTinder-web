@@ -8,27 +8,58 @@ import Feed from "./components/Feed";
 import Connections from "./components/Connections";
 import Requests from "./components/Requests";
 import Chat from "./components/Chat";
+import AuthLayout from "./components/AuthLayout";
 
+
+// function App() {
+//   return (
+//     <>
+//       <Provider store ={appStore}>
+//        <BrowserRouter basename="/">
+//          <Routes>
+//             <Route path ="/" element = {<Body />}>
+//                <Route path ="/" element = {<Feed />}/>
+//                <Route path ="/login" element = {<Login />}/>
+//                <Route path ="/profile" element = {<Profile />}/>
+//                <Route path ="/connections" element = {<Connections />}/>
+//                <Route path ="/requests" element = {<Requests />}/>
+//                <Route path ="/chat/:targetUserId" element = {<Chat />}/>
+//             </Route>
+//          </Routes>
+//        </BrowserRouter>
+//       </Provider> 
+//     </> 
+//   );
+// }
 
 function App() {
   return (
-    <>
-      <Provider store ={appStore}>
-       <BrowserRouter basename="/">
-         <Routes>
-            <Route path ="/" element = {<Body />}>
-               <Route path ="/" element = {<Feed />}/>
-               <Route path ="/login" element = {<Login />}/>
-               <Route path ="/profile" element = {<Profile />}/>
-               <Route path ="/connections" element = {<Connections />}/>
-               <Route path ="/requests" element = {<Requests />}/>
-               <Route path ="/chat/:targetUserId" element = {<Chat />}/>
-            </Route>
-         </Routes>
-       </BrowserRouter>
-      </Provider> 
-    </> 
+    <Provider store={appStore}>
+      <BrowserRouter>
+        <Routes>
+
+          {/* PUBLIC */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+
+
+          {/* PROTECTED */}
+          <Route path="/" element={<Body />}>
+            <Route index element={<Feed />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="connections" element={<Connections />} />
+            <Route path="requests" element={<Requests />} />
+            <Route path="chat/:targetUserId" element={<Chat />} />
+          </Route>
+
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   );
 }
 
 export default App;
+
+
+
