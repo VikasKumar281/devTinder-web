@@ -38,15 +38,16 @@ function App() {
       <BrowserRouter>
         <Routes>
 
-          {/* PUBLIC */}
+          {/* PUBLIC — site URL opens login immediately */}
           <Route element={<AuthLayout />}>
+            <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
           </Route>
 
 
           {/* PROTECTED */}
-          <Route path="/" element={<Body />}>
-            <Route index element={<Feed />} />
+          <Route element={<Body />}>
+            <Route path="/feed" element={<Feed />} />
             <Route path="profile" element={<Profile />} />
             <Route path="connections" element={<Connections />} />
             <Route path="requests" element={<Requests />} />

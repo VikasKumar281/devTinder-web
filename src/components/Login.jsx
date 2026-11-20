@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
- console.log("BASE_URL =", BASE_URL);
+
 const Login = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -12,7 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const [isLoginForm, setIsLoginForm] = useState(false);
+  const [isLoginForm, setIsLoginForm] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const Login = () => {
       );
       dispatch(addUser(response.data));
      
-      return navigate("/");
+      return navigate("/feed");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong!!");
     }

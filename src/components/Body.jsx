@@ -83,6 +83,7 @@ const Body = () => {
       try {
         const res = await axios.get(`${BASE_URL}/profile/view`, {
           withCredentials: true,
+          timeout: 8000,
         });
         dispatch(addUser(res.data));
       } catch (err) {
