@@ -3,7 +3,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
-const UserCard = ({ user, showActions = true, onSent }) => {
+const UserCard = ({ user, showActions = true, onSent, onPhotoClick }) => {
   // console.log(user);
   const { _id, firstName, lastName, photoUrl, age, gender, about, skills } = user;
   const dispatch = useDispatch();
@@ -23,9 +23,12 @@ const UserCard = ({ user, showActions = true, onSent }) => {
   };
 
   return (
-    <div className="relative mx-auto h-[36rem] w-full max-w-[22rem] overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-white/10">
+    <div
+      className="relative mx-auto h-[36rem] w-full max-w-[22rem] overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-white/10"
+      onClick={onPhotoClick}
+    >
       <img
-        className="absolute inset-0 h-full w-full object-cover object-top"
+        className={"absolute inset-0 h-full w-full object-cover object-top " + (onPhotoClick ? "cursor-pointer" : "")}
         loading="lazy"
         src={photoUrl || "/Logo.png"}
         alt={`${firstName || "User"} photo`}
@@ -50,14 +53,20 @@ const UserCard = ({ user, showActions = true, onSent }) => {
           <div className="mt-5 flex items-center justify-center gap-6">
             <button
               className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl text-slate-700 shadow-lg"
-              onClick={() => handleSendRequest("ignored", _id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleSendRequest("ignored", _id);
+              }}
               aria-label="Pass"
             >
               ✕
             </button>
             <button
               className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-500 text-3xl text-white shadow-lg shadow-rose-500/40"
-              onClick={() => handleSendRequest("interested", _id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleSendRequest("interested", _id);
+              }}
               aria-label="Like"
             >
               ♥

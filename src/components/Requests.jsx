@@ -48,35 +48,62 @@ const Requests = () => {
   }
 
   return (
-    <div className="mx-auto my-10 w-full max-w-3xl px-4">
-      <div className="mb-6 flex items-end justify-between">
+    <div className="w-full px-4 py-8 sm:px-8">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide opacity-50">Inbox</p>
-          <h1 className="text-3xl font-semibold">Requests</h1>
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] opacity-50">Inbox</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">Requests</h1>
         </div>
-        <span className="rounded-full bg-primary/15 px-3 py-1 text-sm text-primary">{requests.length} new</span>
+        <span className="shrink-0 rounded-full bg-rose-500/15 px-3 py-1 text-sm font-medium text-rose-300">
+          {requests.length} new
+        </span>
       </div>
-      <div className="flex flex-col gap-4">
+
+      <div className="flex max-w-md flex-col gap-3">
         {requests.map((request) => {
-          const { firstName, lastName, age, photoUrl, gender, about } = request.fromUserId;
+          const person = request.fromUserId || {};
+          const { firstName, lastName, age, photoUrl, gender, about, skills } = person;
           return (
-            <article key={request._id} className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-base-200 p-4 shadow-lg sm:flex-row sm:items-center">
-              <img
-                alt=""
-                className="h-20 w-20 rounded-2xl object-cover"
-                loading="lazy"
-                src={photoUrl || "/Logo.png"}
-              />
-              <div className="min-w-0 flex-1">
-                <h2 className="text-lg font-semibold">{firstName + " " + lastName}</h2>
-                {age && gender && <p className="text-sm capitalize opacity-60">{age + " · " + gender}</p>}
-                <p className="mt-1 line-clamp-2 text-sm opacity-80">{about}</p>
+            <article
+              key={request._id}
+              className="rounded-3xl border border-white/10 bg-base-200 p-4 shadow-lg"
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  alt=""
+                  className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+                  loading="lazy"
+                  src={photoUrl || "/Logo.png"}
+                />
+                <div className="min-w-0">
+                  <h2 className="truncate font-semibold">
+                    {firstName} {lastName}
+                    {age ? <span className="ml-2 font-normal opacity-60">{age}</span> : null}
+                  </h2>
+                  {gender && <p className="text-xs capitalize opacity-60">{gender}</p>}
+                  <p className="mt-1 line-clamp-2 text-sm opacity-80">{about}</p>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button className="btn btn-ghost btn-sm rounded-full" onClick={() => reviewRequest("rejected", request._id)}>
+              {Array.isArray(skills) && skills.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {skills.slice(0, 3).map((skill) => (
+                    <span key={skill} className="rounded-full border border-white/10 px-2 py-1 text-xs">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="mt-4 flex gap-3">
+                <button
+                  className="btn btn-sm flex-1 rounded-full border-white/10 bg-base-300 transition hover:border-white/30 hover:bg-white/10"
+                  onClick={() => reviewRequest("rejected", request._id)}
+                >
                   Pass
                 </button>
-                <button className="btn btn-primary btn-sm rounded-full px-5" onClick={() => reviewRequest("accepted", request._id)}>
+                <button
+                  className="btn btn-sm flex-1 rounded-full border-none bg-rose-500 text-white transition hover:bg-rose-400 hover:shadow-lg hover:shadow-rose-500/30"
+                  onClick={() => reviewRequest("accepted", request._id)}
+                >
                   Accept
                 </button>
               </div>

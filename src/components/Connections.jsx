@@ -28,53 +28,63 @@ const Connections = () => {
 
   if (connections.length === 0) {
     return (
-      <div className="mx-auto my-16 max-w-md px-4 text-center">
-        <h1 className="text-3xl font-semibold">No connections yet</h1>
+      <div className="ml-4 my-16 max-w-md px-4 sm:ml-8">
+        <h1 className="text-3xl font-semibold tracking-tight">No connections yet</h1>
         <p className="mt-2 text-sm opacity-70">When someone accepts your request, they show up here.</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-3 py-6 sm:px-6 sm:py-10">
-      <div className="mb-5 flex items-end justify-between gap-3">
+    <div className="w-full px-4 py-8 sm:px-8">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide opacity-50">Matches</p>
-          <h1 className="text-2xl font-semibold sm:text-3xl">Connections</h1>
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] opacity-50">Matches</p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">Connections</h1>
         </div>
-        <span className="rounded-full bg-base-200 px-3 py-1 text-sm">{connections.length}</span>
+        <span className="shrink-0 rounded-full bg-primary/15 px-3 py-1 text-sm font-medium text-primary">
+          {connections.length}
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="flex max-w-md flex-col gap-3">
         {connections.map((connection) => {
-          const { _id, firstName, lastName, age, photoUrl, gender, about } = connection;
+          const { _id, firstName, lastName, age, photoUrl, gender, about, skills } = connection;
           return (
             <article
               key={_id}
-              className="flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-base-200 shadow-lg"
+              className="rounded-3xl border border-white/10 bg-base-200 p-4 shadow-lg"
             >
-              <div className="flex items-center gap-3 p-3 sm:block sm:p-0">
+              <div className="flex items-center gap-3">
                 <img
                   alt=""
-                  className="h-16 w-16 shrink-0 rounded-2xl object-cover sm:h-52 sm:w-full sm:rounded-none"
+                  className="h-16 w-16 shrink-0 rounded-2xl object-cover"
                   loading="lazy"
                   src={photoUrl || "/Logo.png"}
                 />
-                <div className="min-w-0 sm:p-4">
-                  <h2 className="truncate text-base font-semibold sm:text-lg">
-                    {firstName + " " + lastName}
+                <div className="min-w-0">
+                  <h2 className="truncate font-semibold">
+                    {firstName} {lastName}
+                    {age ? <span className="ml-2 font-normal opacity-60">{age}</span> : null}
                   </h2>
-                  {age && gender && (
-                    <p className="text-sm capitalize opacity-60">{age + " · " + gender}</p>
-                  )}
+                  {gender && <p className="text-xs capitalize opacity-60">{gender}</p>}
                   <p className="mt-1 line-clamp-2 text-sm opacity-80">{about}</p>
                 </div>
               </div>
-              <div className="mt-auto px-3 pb-3 sm:px-4 sm:pb-4">
-                <Link to={"/chat/" + _id} className="block">
-                  <button className="btn btn-primary btn-sm w-full rounded-full">Chat</button>
-                </Link>
-              </div>
+              {Array.isArray(skills) && skills.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {skills.slice(0, 3).map((skill) => (
+                    <span key={skill} className="rounded-full border border-white/10 px-2 py-1 text-xs">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <Link to={"/chat/" + _id} className="mt-4 block">
+                <button className="btn btn-primary btn-sm w-full rounded-full transition hover:brightness-110">
+                  Chat
+                </button>
+              </Link>
             </article>
           );
         })}
