@@ -24,7 +24,7 @@ const UserCard = ({ user, showActions = true, onSent, onPhotoClick }) => {
 
   return (
     <div
-      className="relative mx-auto h-[36rem] w-full max-w-[22rem] overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-white/10"
+      className="relative h-[36rem] w-full max-w-[22rem] shrink-0 overflow-hidden rounded-[2rem] bg-neutral-900 shadow-2xl ring-1 ring-white/10"
       onClick={onPhotoClick}
     >
       <img

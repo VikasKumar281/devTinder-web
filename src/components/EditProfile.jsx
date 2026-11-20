@@ -25,7 +25,7 @@ const EditProfile = ({ user }) => {
     Array.isArray(user.skills) ? user.skills.join(", ") : user.skills || ""
   );
   const [error, setError] = useState("");
-  const [showToast, setShowToast] = useState(false);
+  const [toast, setToast] = useState("");
   const [saving, setSaving] = useState(false);
 
   const dispatch = useDispatch();
@@ -74,29 +74,8 @@ const EditProfile = ({ user }) => {
       }
       setPhotoUrl(nextPhoto);
       setError("");
-      savePhoto(nextPhoto);
     };
     reader.readAsDataURL(file);
-  };
-
-  const savePhoto = async (nextPhoto) => {
-    setSaving(true);
-    setError("");
-    try {
-      const res = await axios.post(
-        BASE_URL + "/profile/edit",
-        { photoUrl: nextPhoto },
-        { withCredentials: true }
-      );
-      dispatch(addUser(res?.data?.data));
-      saved.current.photoUrl = nextPhoto;
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    } catch (err) {
-      setError(err.response?.data || "Photo could not be saved. Keep the backend running on port 7777.");
-    } finally {
-      setSaving(false);
-    }
   };
 
   const saveProfile = async () => {
@@ -128,8 +107,8 @@ const EditProfile = ({ user }) => {
         about,
         skills,
       };
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setToast("Profile saved");
+      setTimeout(() => setToast(""), 2800);
     } catch (err) {
       setError(err.response?.data || "Could not save profile");
     } finally {
@@ -148,8 +127,8 @@ const EditProfile = ({ user }) => {
       );
       setCurrentPassword("");
       setNewPassword("");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setToast("Password updated");
+      setTimeout(() => setToast(""), 2800);
     } catch (err) {
       setError(err.response?.data || "Could not update password");
     } finally {
@@ -173,7 +152,7 @@ const EditProfile = ({ user }) => {
               <input
                 type="email"
                 value={emailId}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full rounded-full"
                 onChange={(e) => setEmailId(e.target.value)}
               />
             </label>
@@ -184,7 +163,7 @@ const EditProfile = ({ user }) => {
                 <input
                   type="text"
                   value={firstName}
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full rounded-full"
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </label>
@@ -193,7 +172,7 @@ const EditProfile = ({ user }) => {
                 <input
                   type="text"
                   value={lastName}
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full rounded-full"
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </label>
@@ -203,7 +182,7 @@ const EditProfile = ({ user }) => {
                   type="number"
                   min="18"
                   value={age}
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full rounded-full"
                   onChange={(e) => setAge(e.target.value)}
                 />
               </label>
@@ -211,7 +190,7 @@ const EditProfile = ({ user }) => {
                 <span className="label-text mb-1">Gender</span>
                 <select
                   value={gender}
-                  className="select select-bordered w-full"
+                  className="select select-bordered w-full rounded-full"
                   onChange={(e) => setGender(e.target.value)}
                 >
                   <option value="">Select</option>
@@ -234,13 +213,13 @@ const EditProfile = ({ user }) => {
                   ref={fileRef}
                   type="file"
                   accept="image/*"
-                  className="block w-full max-w-xs text-sm"
+                  className="block w-full max-w-xs cursor-pointer text-sm file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-content hover:file:opacity-90"
                   onChange={choosePhoto}
                 />
                 <p className="mt-2 text-xs opacity-60">
                   {saving
                     ? "Saving photo in the database..."
-                    : "Choose a JPG or PNG. It is saved in the users collection."}
+                    : "JPG, PNG, or WEBP up to 10 MB. Press Save profile to store it."}
                 </p>
                 {error && <p className="mt-2 max-w-xs text-sm text-error">{error}</p>}
               </div>
@@ -250,7 +229,7 @@ const EditProfile = ({ user }) => {
               <span className="label-text mb-1">About</span>
               <textarea
                 value={about}
-                className="textarea textarea-bordered min-h-28 w-full"
+                className="textarea textarea-bordered min-h-28 w-full rounded-3xl"
                 onChange={(e) => setAbout(e.target.value)}
               />
             </label>
@@ -261,7 +240,7 @@ const EditProfile = ({ user }) => {
                 type="text"
                 value={skills}
                 placeholder="React, Node, MongoDB"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full rounded-full"
                 onChange={(e) => setSkills(e.target.value)}
               />
               <span className="mt-1 text-xs opacity-60">Separate skills with commas.</span>
@@ -283,14 +262,14 @@ const EditProfile = ({ user }) => {
                   type="password"
                   value={currentPassword}
                   placeholder="Current password"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full rounded-full"
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
                 <input
                   type="password"
                   value={newPassword}
                   placeholder="New password"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full rounded-full"
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
               </div>
@@ -299,7 +278,7 @@ const EditProfile = ({ user }) => {
               </p>
               <button
                 type="button"
-                className="btn btn-outline btn-sm mt-3"
+                className="btn btn-outline btn-sm mt-3 rounded-full"
                 onClick={updatePassword}
                 disabled={saving || !currentPassword || !newPassword}
               >
@@ -312,8 +291,8 @@ const EditProfile = ({ user }) => {
               <button
                 className={
                   changed
-                    ? "btn btn-primary"
-                    : "btn border-base-300 bg-base-300 text-base-content/70"
+                    ? "btn btn-primary rounded-full px-6"
+                    : "btn rounded-full border-base-300 bg-base-300 px-6 text-base-content/70"
                 }
                 onClick={saveProfile}
                 disabled={!changed || saving}
@@ -333,10 +312,13 @@ const EditProfile = ({ user }) => {
         </div>
       </div>
 
-      {showToast && (
-        <div className="toast toast-top toast-center">
-          <div className="alert alert-success">
-            <span>Profile saved successfully.</span>
+      {toast && (
+        <div className="toast toast-top toast-center z-50">
+          <div className="flex items-center gap-3 rounded-full border border-emerald-400/30 bg-base-200 px-5 py-3 text-sm shadow-2xl">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm text-white">
+              ✓
+            </span>
+            <span className="font-medium">{toast}</span>
           </div>
         </div>
       )}
