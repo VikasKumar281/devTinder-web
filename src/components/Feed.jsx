@@ -29,15 +29,18 @@ const Feed = () => {
   if (!feed) return;
 
   if (feed.length <= 0) {
-    return <h1 className="flex justify-center my-10">No new users found</h1>;
+    return (
+      <div className="mx-auto my-16 max-w-md px-4 text-center">
+        <h1 className="text-2xl font-semibold">You are all caught up</h1>
+        <p className="mt-2 text-sm opacity-70">No new developers in your feed right now.</p>
+      </div>
+    );
   }
 
   return (
-    feed && (
-      <div className="flex justify-center my-10">
-        <UserCard user={feed[0]} showActions={true} />
-      </div>
-    )
+    <div className="mx-auto my-10 flex w-full max-w-md justify-center px-4">
+      <UserCard user={feed[0]} showActions={true} />
+    </div>
   );
 };
 

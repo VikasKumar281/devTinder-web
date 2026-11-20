@@ -22,15 +22,27 @@ const UserCard = ({ user, showActions = true }) => {
   };
 
   return (
-    <div className="card bg-base-300 w-96 shadow-sm">
-      <figure className="w-full h-100 overflow-hidden">
-        <img className="w-full h-full object-cover" src={photoUrl} alt="User Photo" />
+    <div className="card w-full max-w-sm overflow-hidden bg-base-200 shadow-xl">
+      <figure className="h-80 w-full overflow-hidden bg-base-300">
+        <img
+          className="h-full w-full object-cover"
+          src={photoUrl || "/Logo.png"}
+          alt={`${firstName || "User"} photo`}
+        />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title">{`${firstName} ${lastName}`}</h2>
-        {age && gender && <p>{`${age}, ${gender}`}</p>}
-        <p>{about}</p>
-        <p>{skills}</p>
+      <div className="card-body gap-2">
+        <h2 className="card-title">{`${firstName || ""} ${lastName || ""}`}</h2>
+        {age && gender && <p className="text-sm opacity-70">{`${age} · ${gender}`}</p>}
+        <p className="text-sm">{about}</p>
+        {Array.isArray(skills) && skills.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span key={skill} className="badge badge-outline">
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
 
         {showActions && (
           <div className="card-actions justify-center my-4">

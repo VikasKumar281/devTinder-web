@@ -1,124 +1,113 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
-import { createSocketConnection } from '../utils/socket';
-import { useSelector } from 'react-redux';
-import { BASE_URL } from '../utils/constants';
-import axios from 'axios';
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { createSocketConnection } from "../utils/socket";
+import { useSelector } from "react-redux";
+import { BASE_URL } from "../utils/constants";
+import axios from "axios";
 
 const Chat = () => {
-  
-  const { targetUserId } = useParams(); 
-  // console.log(targetUserId);
-     
+  const { targetUserId } = useParams();
   const [messages, setMessages] = useState([]);
-  const [newMessage , setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const socketRef = useRef(null);
+  const listRef = useRef(null);
 
-  const user = useSelector(store => store.user);
+  const user = useSelector((store) => store.user);
   const userId = user?._id;
-  
-  const fetchChatMessages = async() => {
-    const chat = await axios.get(BASE_URL + "/chat/"+targetUserId , {
-      withCredentials: true,
-    });
-
-    console.log(chat.data.messages);
-
-    const chatMessages = chat?.data?.messages.map( msg => {
-      const {senderId ,text} = msg;
-      return {
-        firstName:senderId?.firstName,
-        lastName:senderId?.lastName, 
-        text,
-      }
-
-    });
-
-    setMessages(chatMessages);
-  };
-  
-  //As soon as my page loads for the first time, call the function => fetchChatMessages();
-  useEffect(() =>{
-    fetchChatMessages();
-  },[]);
 
   useEffect(() => {
-    if(!userId){
-      return;
-    }
+    const fetchChatMessages = async () => {
+      try {
+        const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
+          withCredentials: true,
+        });
+        const chatMessages = (chat?.data?.messages || []).map((msg) => {
+          const { senderId, text } = msg;
+          return {
+            firstName: senderId?.firstName,
+            lastName: senderId?.lastName,
+            text,
+          };
+        });
+        setMessages(chatMessages);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchChatMessages();
+  }, [targetUserId]);
+
+  useEffect(() => {
+    if (!userId) return;
 
     const socket = createSocketConnection();
-
-    //As soon as the page loaded , the socket connection is made and joinChat event is emitted
-    socket.emit("joinChat",{
+    socketRef.current = socket;
+    socket.emit("joinChat", {
       firstName: user.firstName,
       userId,
-      targetUserId
+      targetUserId,
+    });
+    socket.on("messageReceived", ({ firstName, lastName, text }) => {
+      setMessages((messages) => [...messages, { firstName, lastName, text }]);
     });
 
-    socket.on("messageReceived",({firstName, lastName, text}) => {
-      console.log(firstName + " : " + text);  
-      setMessages((messages) => [...messages,{firstName,lastName, text}]);
-    })
-
-    //As soon as my components unload i have to disconnect the socket. 
     return () => {
       socket.disconnect();
-    }
+      socketRef.current = null;
+    };
+  }, [userId, targetUserId]);
 
-  },[userId, targetUserId]);
- 
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const sendMessage = () => {
-    const socket = createSocketConnection();
-    socket.emit("sendMessage" , {
-      firstName: user.firstName, 
-      lastName: user.lastName, 
+    const text = newMessage.trim();
+    if (!text || !socketRef.current) return;
+    socketRef.current.emit("sendMessage", {
+      firstName: user.firstName,
+      lastName: user.lastName,
       userId,
-      targetUserId, 
-      text: newMessage,
-     });
+      targetUserId,
+      text,
+    });
     setNewMessage("");
   };
-  
+
   return (
-    <div className='w-3/4 mx-auto border border-gray-600 m-5 h-[70vh] flex flex-col'>
-        <h1 className='p-5 border-b border-gray-600'>Chat</h1>
-        <div className='flex-1 overflow-scroll p-5'>
-           {messages.map((msg , index) => {
-             return (
-                <div 
-                  key = {index} 
-                  className = {
-                    "chat " + 
-                    (user.firstName ===  msg.firstName ? "chat-end" : "chat-start")
-                 }
-                >
-                 {/* <div className="chat-image avatar">
-                    <div className="w-10 rounded-full">
-                      <img
-                      alt="image"
-                      src={user?.photoUrl}
-                      />
-                   </div>
-                 </div> */}
-                 <div className="chat-header">
-                {`${msg.firstName}  ${msg.lastName}`}
-                 </div>
-                 <div className="chat-bubble">{msg.text}</div>
-                 <div className="chat-footer opacity-50">Delivered</div>
-               </div>
-             )
-           })}
-        </div>
-        <div className='p-5 border-t border-gray-600 flex items-center gap-2'>
-            <input
-            value ={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)} 
-            className='flex-1 border border-gray-500 text-white rounded p-2'> 
-            </input>
-            <button onClick={sendMessage} className='btn btn-secondary'>Send</button>
-        </div>
+    <div className="mx-auto my-6 flex h-[72vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-base-300 bg-base-200 shadow-sm">
+      <h1 className="border-b border-base-300 px-5 py-4 text-lg font-semibold">Chat</h1>
+      <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto p-5">
+        {messages.map((msg, index) => {
+          const mine = user.firstName === msg.firstName;
+          return (
+            <div key={index} className={"chat " + (mine ? "chat-end" : "chat-start")}>
+              <div className="chat-header opacity-70">
+                {`${msg.firstName || ""} ${msg.lastName || ""}`}
+              </div>
+              <div className={"chat-bubble " + (mine ? "chat-bubble-primary" : "")}>{msg.text}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-2 border-t border-base-300 p-4">
+        <input
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
+          placeholder="Write a message"
+          className="input input-bordered flex-1"
+        />
+        <button onClick={sendMessage} className="btn btn-primary">
+          Send
+        </button>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Chat;
