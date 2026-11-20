@@ -105,11 +105,13 @@ const Body = () => {
   if (!authChecked) return null;
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <NavBar />
-      <Outlet />
+      <main className="page-fade flex-1">
+        <Outlet />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

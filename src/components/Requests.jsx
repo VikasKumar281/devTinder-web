@@ -41,7 +41,7 @@ const Requests = () => {
   if (requests.length === 0) {
     return (
       <div className="mx-auto my-16 max-w-md px-4 text-center">
-        <h1 className="text-2xl font-semibold">No requests</h1>
+        <h1 className="text-3xl font-semibold">No requests</h1>
         <p className="mt-2 text-sm opacity-70">New connection requests will land here.</p>
       </div>
     );
@@ -49,31 +49,38 @@ const Requests = () => {
 
   return (
     <div className="mx-auto my-10 w-full max-w-3xl px-4">
-      <h1 className="mb-6 text-3xl font-bold">Connection requests</h1>
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-wide opacity-50">Inbox</p>
+          <h1 className="text-3xl font-semibold">Requests</h1>
+        </div>
+        <span className="rounded-full bg-primary/15 px-3 py-1 text-sm text-primary">{requests.length} new</span>
+      </div>
       <div className="flex flex-col gap-4">
         {requests.map((request) => {
-          const { _id, firstName, lastName, age, photoUrl, gender, about } = request.fromUserId;
+          const { firstName, lastName, age, photoUrl, gender, about } = request.fromUserId;
           return (
-            <div key={_id} className="flex flex-col gap-4 rounded-2xl bg-base-200 p-4 shadow-sm sm:flex-row sm:items-center">
+            <article key={request._id} className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-base-200 p-4 shadow-lg sm:flex-row sm:items-center">
               <img
                 alt=""
-                className="h-16 w-16 rounded-full object-cover"
+                className="h-20 w-20 rounded-2xl object-cover"
+                loading="lazy"
                 src={photoUrl || "/Logo.png"}
               />
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg font-semibold">{firstName + " " + lastName}</h2>
-                {age && gender && <p className="text-sm opacity-70">{age + " · " + gender}</p>}
-                <p className="text-sm">{about}</p>
+                {age && gender && <p className="text-sm capitalize opacity-60">{age + " · " + gender}</p>}
+                <p className="mt-1 line-clamp-2 text-sm opacity-80">{about}</p>
               </div>
               <div className="flex gap-2">
-                <button className="btn btn-ghost btn-sm" onClick={() => reviewRequest("rejected", request._id)}>
-                  Reject
+                <button className="btn btn-ghost btn-sm rounded-full" onClick={() => reviewRequest("rejected", request._id)}>
+                  Pass
                 </button>
-                <button className="btn btn-primary btn-sm" onClick={() => reviewRequest("accepted", request._id)}>
+                <button className="btn btn-primary btn-sm rounded-full px-5" onClick={() => reviewRequest("accepted", request._id)}>
                   Accept
                 </button>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>

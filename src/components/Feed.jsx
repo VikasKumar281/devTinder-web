@@ -9,13 +9,13 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
   
+  const userId = useSelector((store) => store.user?._id);
+
   const getFeed = async () => {
-    if (feed) return;
     try {
       const res = await axios.get(BASE_URL + "/user/feed", {
         withCredentials: true,
       });
-      // console.log(res)
       dispatch(addFeed(res?.data?.data));
     } catch (err) {
       console.error(err);
@@ -23,8 +23,8 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    getFeed();
-  }, []);
+    if (userId) getFeed();
+  }, [userId]);
 
   if (!feed) return;
 
@@ -38,8 +38,8 @@ const Feed = () => {
   }
 
   return (
-    <div className="mx-auto my-10 flex w-full max-w-md justify-center px-4">
-      <UserCard user={feed[0]} showActions={true} />
+    <div className="mx-auto flex w-full justify-center px-4 py-8">
+      <UserCard key={feed[0]._id} user={feed[0]} showActions={true} />
     </div>
   );
 };
