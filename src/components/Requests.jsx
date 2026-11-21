@@ -3,13 +3,13 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
-import PageLoader from "./PageLoader";
+import PageLoader, { withMinDelay } from "./PageLoader";
 import EmptyState from "./EmptyState";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(!requests);
+  const [loading, setLoading] = useState(true);
 
   const reviewRequest = async (status, _id) => {
     try {
@@ -27,10 +27,12 @@ const Requests = () => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(BASE_URL + "/user/requests/received", {
-        withCredentials: true,
+      await withMinDelay(async () => {
+        const res = await axios.get(BASE_URL + "/user/requests/received", {
+          withCredentials: true,
+        });
+        dispatch(addRequests(res?.data?.data));
       });
-      dispatch(addRequests(res?.data?.data));
     } catch (err) {
       console.error(err);
       dispatch(addRequests([]));

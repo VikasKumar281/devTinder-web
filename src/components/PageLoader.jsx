@@ -1,5 +1,13 @@
 import BrandLogo from "./BrandLogo";
 
+export const withMinDelay = async (work, ms = 480) => {
+  const started = Date.now();
+  const result = typeof work === "function" ? await work() : await work;
+  const wait = Math.max(0, ms - (Date.now() - started));
+  if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
+  return result;
+};
+
 const PageLoader = ({ label = "Loading", variant = "pulse" }) => {
   if (variant === "list") {
     return (

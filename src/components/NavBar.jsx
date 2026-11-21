@@ -8,6 +8,15 @@ import { clearFeed } from "../utils/feedSlice";
 import BrandLogo from "./BrandLogo";
 import LanguageMenu from "./LanguageMenu";
 import { useI18n } from "../utils/i18n";
+import { useNavSplash } from "./NavSplash";
+
+const LINKEDIN_URL = "https://www.linkedin.com/in/vikaskumar-fullstack/";
+
+const LinkedInIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+    <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.73V1.73C24 .77 23.21 0 22.23 0Z" />
+  </svg>
+);
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -15,6 +24,7 @@ const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useI18n();
+  const { trigger } = useNavSplash();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [requestNotes, setRequestNotes] = useState([]);
@@ -93,6 +103,7 @@ const NavBar = () => {
   const openProfile = (userId) => {
     setSearchText("");
     setSearchResults([]);
+    trigger();
     navigate("/user/" + userId);
   };
 
@@ -100,7 +111,8 @@ const NavBar = () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
-      dispatch(clearFeed());
+        dispatch(clearFeed());
+      trigger();
       return navigate("/login");
     } catch (err) {
       console.error(err);
@@ -108,21 +120,24 @@ const NavBar = () => {
   };
 
   const linkClass = (path) =>
-    "nav-link hidden sm:inline-flex " + (location.pathname === path ? "nav-link-active" : "");
+    "nav-link " + (location.pathname === path ? "nav-link-active" : "");
+
+  const premium = Boolean(user?.isPremium && user?.membershipType && user.membershipType !== "free");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur-2xl">
-      <div className="mx-auto flex h-[4.4rem] w-full max-w-[90rem] items-center justify-between gap-3 px-3 sm:px-6">
+    <header className="site-nav">
+      <div className="site-nav-bar">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link
             to={user ? "/feed" : "/"}
-            className="flex shrink-0 items-center gap-2.5 px-1 text-[1.05rem] font-extrabold tracking-tight"
+            className="site-nav-brand"
+            onClick={trigger}
           >
             <BrandLogo size="md" className="rounded-[0.9rem] ring-1 ring-white/15" />
             <span className="hidden sm:inline">DevTinder</span>
           </Link>
           {user && (
-            <div className="relative w-[min(18rem,38vw)]">
+            <div className="relative hidden w-[min(16rem,32vw)] md:block">
               <label className="search-shell">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 opacity-50" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="11" cy="11" r="7" />
@@ -171,17 +186,44 @@ const NavBar = () => {
           )}
         </div>
 
-        <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <nav className="flex shrink-0 items-center gap-1.5">
+          <div className="nav-cluster">
+            {user && (
+              <Link to="/feed" className={linkClass("/feed")} onClick={trigger}>
+                Feed
+              </Link>
+            )}
+            <Link to="/support" className={linkClass("/support")} onClick={trigger}>
+              {t("support")}
+            </Link>
+            <Link to="/contact" className={linkClass("/contact")} onClick={trigger}>
+              {t("contact")}
+            </Link>
+            <Link
+              to="/premium"
+              className={
+                "nav-link nav-premium " +
+                (location.pathname.startsWith("/premium") ? "nav-link-active" : "")
+              }
+              onClick={trigger}
+            >
+              {t("plans")}
+            </Link>
+          </div>
+
           <LanguageMenu />
-          <Link to="/support" className={linkClass("/support")}>
-            {t("support")}
-          </Link>
-          <Link to="/contact" className={linkClass("/contact")}>
-            {t("contact")}
-          </Link>
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="nav-icon-btn hidden sm:inline-flex"
+            aria-label="LinkedIn"
+          >
+            <LinkedInIcon />
+          </a>
 
           {!user && (
-            <Link to="/login" className="nav-login">
+            <Link to="/login" className="nav-login" onClick={trigger}>
               {t("signIn")}
             </Link>
           )}
@@ -192,12 +234,15 @@ const NavBar = () => {
                 <button
                   type="button"
                   tabIndex={0}
-                  className="btn btn-ghost btn-circle relative"
+                  className="nav-icon-btn relative"
                   aria-label={t("notifications")}
                   onMouseDown={markNotificationsRead}
                   onClick={markNotificationsRead}
                 >
-                  <span className="text-xl">🔔</span>
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M6 9a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />
+                    <path d="M10 20a2 2 0 0 0 4 0" />
+                  </svg>
                   {unreadCount > 0 && (
                     <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] text-white">
                       {unreadCount}
@@ -221,8 +266,9 @@ const NavBar = () => {
                       type="button"
                       className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/10"
                       onClick={() => {
-                        closeMenu();
-                        navigate("/requests");
+                    closeMenu();
+                    trigger();
+                    navigate("/requests");
                       }}
                     >
                       <img
@@ -249,8 +295,9 @@ const NavBar = () => {
                       type="button"
                       className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/10"
                       onClick={() => {
-                        closeMenu();
-                        navigate("/chat/" + note.userId);
+                    closeMenu();
+                    trigger();
+                    navigate("/chat/" + note.userId);
                       }}
                     >
                       <img
@@ -267,20 +314,22 @@ const NavBar = () => {
                     </button>
                   ))}
                   <div className="mt-2 flex gap-2 sm:hidden">
-                    <Link to="/support" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={closeMenu}>
+                    <Link to="/support" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={() => { trigger(); closeMenu(); }}>
                       {t("support")}
                     </Link>
-                    <Link to="/contact" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={closeMenu}>
+                    <Link to="/contact" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={() => { trigger(); closeMenu(); }}>
                       {t("contact")}
                     </Link>
                   </div>
                 </div>
               </div>
               <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                  <div className="w-10 rounded-full ring-2 ring-rose-400/50">
-                    <img alt="user photo" src={user?.photoUrl || "/Logo.png"} />
-                  </div>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className={"nav-avatar " + (premium ? "nav-avatar-premium" : "")}
+                >
+                  <img alt="user photo" src={user?.photoUrl || "/Logo.png"} />
                 </div>
                 <ul
                   tabIndex={0}
@@ -291,32 +340,47 @@ const NavBar = () => {
                       {user.firstName} {user.lastName}
                     </p>
                     <p className="truncate text-xs opacity-60">{user.emailId}</p>
+                    {user.isPremium && user.membershipType && user.membershipType !== "free" && (
+                      <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-amber-300">
+                        {user.membershipType} plan
+                      </p>
+                    )}
                   </li>
                   <div className="my-1 h-px bg-white/10" />
                   <li>
-                    <Link to="/profile" className={itemClass("/profile")} onClick={closeMenu}>
+                    <Link to="/profile" className={itemClass("/profile")} onClick={() => { trigger(); closeMenu(); }}>
                       {t("profile")}
                     </Link>
                   </li>
                   <li>
-                    <Link to="/connections" className={itemClass("/connections")} onClick={closeMenu}>
+                    <Link to="/connections" className={itemClass("/connections")} onClick={() => { trigger(); closeMenu(); }}>
                       {t("connections")}
                     </Link>
                   </li>
                   <li>
-                    <Link to="/requests" className={itemClass("/requests")} onClick={closeMenu}>
+                    <Link to="/requests" className={itemClass("/requests")} onClick={() => { trigger(); closeMenu(); }}>
                       {t("requests")}
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/premium" onClick={() => { trigger(); closeMenu(); }}>
+                      {t("plans")}
+                    </Link>
+                  </li>
                   <li className="sm:hidden">
-                    <Link to="/support" onClick={closeMenu}>
+                    <Link to="/support" onClick={() => { trigger(); closeMenu(); }}>
                       {t("support")}
                     </Link>
                   </li>
                   <li className="sm:hidden">
-                    <Link to="/contact" onClick={closeMenu}>
+                    <Link to="/contact" onClick={() => { trigger(); closeMenu(); }}>
                       {t("contact")}
                     </Link>
+                  </li>
+                  <li>
+                    <a href={LINKEDIN_URL} target="_blank" rel="noreferrer" onClick={closeMenu}>
+                      LinkedIn
+                    </a>
                   </li>
                   <div className="my-1 h-px bg-white/10" />
                   <li>

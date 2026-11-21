@@ -1,25 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import SplashScreen from "./SplashScreen";
+import { BASE_URL } from "../utils/constants";
+import { addUser } from "../utils/userSlice";
 
 const AuthLayout = () => {
-  const [splash, setSplash] = useState(true);
-  const [fading, setFading] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector((store) => store.user);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFading(true), 1700);
-    const hideTimer = setTimeout(() => setSplash(false), 2300);
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
-    };
-  }, []);
+    if (user) return;
+    axios
+      .get(`${BASE_URL}/profile/view`, { withCredentials: true, timeout: 8000 })
+      .then((res) => dispatch(addUser(res.data)))
+      .catch(() => {});
+  }, [user, dispatch]);
 
   return (
     <div className="flex min-h-screen flex-col">
-      {splash && <SplashScreen fading={fading} />}
       <NavBar />
       <main className="page-fade flex-1">
         <Outlet />

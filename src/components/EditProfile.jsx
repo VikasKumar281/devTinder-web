@@ -162,6 +162,11 @@ const EditProfile = ({ user }) => {
               />
             </label>
 
+            {user?.isPremium && user?.membershipType && user.membershipType !== "free" && (
+              <p className="rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-2 text-sm font-semibold capitalize text-amber-200">
+                {user.membershipType} membership
+              </p>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="form-control w-full">
                 <span className="label-text mb-1">First name</span>

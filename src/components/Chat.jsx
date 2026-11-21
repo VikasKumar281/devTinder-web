@@ -4,12 +4,14 @@ import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
+import PageLoader, { withMinDelay } from "./PageLoader";
 
 const Chat = () => {
   const { targetUserId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [person, setPerson] = useState(null);
+  const [loading, setLoading] = useState(true);
   const socketRef = useRef(null);
   const listRef = useRef(null);
 
@@ -46,8 +48,10 @@ const Chat = () => {
         setPerson(null);
       }
     };
-    fetchChatMessages();
-    loadPerson();
+    setLoading(true);
+    withMinDelay(Promise.all([fetchChatMessages(), loadPerson()])).finally(() => {
+      setLoading(false);
+    });
   }, [targetUserId]);
 
   useEffect(() => {
@@ -90,6 +94,8 @@ const Chat = () => {
   };
 
   const title = person ? `${person.firstName} ${person.lastName || ""}` : "Chat";
+
+  if (loading) return <PageLoader label="Loading chat" />;
 
   return (
     <div className="mx-auto flex h-[calc(100vh-8.5rem)] w-full max-w-2xl flex-col px-4 py-4">

@@ -4,7 +4,8 @@ import { Provider } from "react-redux";
 import appStore from "./utils/appStore";
 import Body from "./components/Body";
 import AuthLayout from "./components/AuthLayout";
-import SplashScreen from "./components/SplashScreen";
+import PageLoader from "./components/PageLoader";
+import { NavSplashProvider } from "./components/NavSplash";
 
 const Login = lazy(() => import("./components/Login"));
 const Profile = lazy(() => import("./components/Profile"));
@@ -15,6 +16,8 @@ const Chat = lazy(() => import("./components/Chat"));
 const ViewUser = lazy(() => import("./components/ViewUser"));
 const Support = lazy(() => import("./components/Support"));
 const Contact = lazy(() => import("./components/Contact"));
+const Premium = lazy(() => import("./components/Premium"));
+const PremiumSuccess = lazy(() => import("./components/PremiumSuccess"));
 
 
 // function App() {
@@ -42,7 +45,8 @@ function App() {
   return (
     <Provider store={appStore}>
       <BrowserRouter>
-        <Suspense fallback={<SplashScreen />}>
+        <NavSplashProvider>
+        <Suspense fallback={<PageLoader label="Loading page" />}>
         <Routes>
 
           {/* PUBLIC — site URL opens login immediately */}
@@ -51,6 +55,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/support" element={<Support />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/premium/success" element={<PremiumSuccess />} />
           </Route>
 
 
@@ -66,6 +72,7 @@ function App() {
 
         </Routes>
         </Suspense>
+        </NavSplashProvider>
       </BrowserRouter>
     </Provider>
   );

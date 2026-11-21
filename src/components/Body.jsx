@@ -71,6 +71,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import { useEffect, useState } from "react";
+import PageLoader from "./PageLoader";
 
 const Body = () => {
   const dispatch = useDispatch();
@@ -102,7 +103,7 @@ const Body = () => {
   }, [user, dispatch, navigate]);
 
   // ⛔ Jab tak auth decide na ho, kuch render hi mat karo
-  if (!authChecked) return null;
+  if (!authChecked) return <PageLoader label="Loading DevTinder" />;
 
   return (
     <div className="flex min-h-screen flex-col">

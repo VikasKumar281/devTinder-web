@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import UserCard from "./UserCard";
+import PageLoader, { withMinDelay } from "./PageLoader";
 
 const ViewUser = () => {
   const { userId } = useParams();
@@ -18,10 +19,12 @@ const ViewUser = () => {
       setDetailsOpen(false);
       setProfile(null);
       try {
-        const res = await axios.get(BASE_URL + "/user/view/" + userId, {
-          withCredentials: true,
+        await withMinDelay(async () => {
+          const res = await axios.get(BASE_URL + "/user/view/" + userId, {
+            withCredentials: true,
+          });
+          setProfile(res.data.data);
         });
-        setProfile(res.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Could not open this profile");
       }
@@ -34,7 +37,7 @@ const ViewUser = () => {
   }
 
   if (!profile) {
-    return <p className="p-10 text-center text-sm opacity-60">Loading profile...</p>;
+    return <PageLoader label="Loading profile" variant="card" />;
   }
 
   return (

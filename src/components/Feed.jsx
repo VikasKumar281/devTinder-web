@@ -4,23 +4,25 @@ import axios from "axios";
 import { addFeed } from "../utils/feedSlice";
 import { useEffect, useState } from "react";
 import UserCard from "./UserCard";
-import PageLoader from "./PageLoader";
+import PageLoader, { withMinDelay } from "./PageLoader";
 import EmptyState from "./EmptyState";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
   const userId = useSelector((store) => store.user?._id);
+  const [loading, setLoading] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [loading, setLoading] = useState(!feed);
 
   const getFeed = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(BASE_URL + "/user/feed", {
-        withCredentials: true,
+      await withMinDelay(async () => {
+        const res = await axios.get(BASE_URL + "/user/feed", {
+          withCredentials: true,
+        });
+        dispatch(addFeed(res?.data?.data));
       });
-      dispatch(addFeed(res?.data?.data));
     } catch (err) {
       console.error(err);
       dispatch(addFeed([]));
@@ -32,6 +34,10 @@ const Feed = () => {
   useEffect(() => {
     if (userId) getFeed();
   }, [userId]);
+
+  useEffect(() => {
+    setDetailsOpen(false);
+  }, [feed?.[0]?._id]);
 
   if (loading || !feed) {
     return <PageLoader label="Finding developers" variant="card" />;
@@ -48,54 +54,81 @@ const Feed = () => {
   }
 
   const person = feed[0];
+  const stack = feed.slice(0, 3);
 
   return (
-    <div className="mx-auto flex w-full flex-col items-center justify-center gap-[1cm] px-4 py-8 lg:flex-row lg:items-stretch">
-      <UserCard
-        key={person._id}
-        user={person}
-        showActions={true}
-        onPhotoClick={() => setDetailsOpen(true)}
-        onSent={() => setDetailsOpen(false)}
-      />
-      {detailsOpen && (
-        <aside className="flex h-[36rem] w-full max-w-[22rem] flex-col overflow-hidden rounded-[2rem] bg-base-200/90 shadow-2xl ring-1 ring-white/10 backdrop-blur">
-          <div className="relative h-3/5 shrink-0">
-            <img
-              src={person.photoUrl || "/Logo.png"}
-              alt=""
-              className="h-full w-full object-cover object-center"
-            />
-            <button
-              type="button"
-              className="btn btn-sm absolute right-3 top-3 rounded-full border-none bg-black/60 text-white"
-              onClick={() => setDetailsOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-          <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {person.firstName} {person.lastName}
-              {person.age ? <span className="ml-2 font-light opacity-70">{person.age}</span> : null}
-            </h2>
-            {person.gender && <p className="mt-1 text-sm capitalize opacity-60">{person.gender}</p>}
-            <p className="mt-3 text-sm leading-relaxed opacity-85">{person.about}</p>
-            {Array.isArray(person.skills) && person.skills.length > 0 && (
-              <div className="mt-4">
-                <p className="mb-2 text-[11px] uppercase tracking-[0.16em] opacity-50">Skills</p>
-                <div className="flex flex-wrap gap-2">
-                  {person.skills.map((skill) => (
-                    <span key={skill} className="rounded-full bg-base-300 px-3 py-1 text-sm">
-                      {skill}
-                    </span>
-                  ))}
+    <div className="tinder-feed">
+      <div className="tinder-stage">
+        <div className="tinder-deck">
+          {stack
+            .slice()
+            .reverse()
+            .map((card, index, list) => {
+              const front = index === list.length - 1;
+              return (
+                <div
+                  key={card._id}
+                  className="tinder-layer"
+                  style={{
+                    transform: front
+                      ? "none"
+                      : `scale(${1 - (list.length - 1 - index) * 0.045}) translateY(${(list.length - 1 - index) * 14}px)`,
+                    zIndex: index + 1,
+                  }}
+                >
+                  <UserCard
+                    user={card}
+                    showActions={front}
+                    swipeable={front}
+                    stacked={!front}
+                    onPhotoClick={front ? () => setDetailsOpen(true) : undefined}
+                    onSent={() => setDetailsOpen(false)}
+                  />
                 </div>
-              </div>
-            )}
-          </div>
-        </aside>
-      )}
+              );
+            })}
+        </div>
+
+        {detailsOpen && (
+          <aside className="feed-info-card">
+            <div className="relative h-[58%] shrink-0">
+              <img
+                src={person.photoUrl || "/Logo.png"}
+                alt=""
+                className="h-full w-full object-cover object-center"
+              />
+              <button
+                type="button"
+                className="btn btn-sm absolute right-3 top-3 rounded-full border-none bg-black/60 text-white"
+                onClick={() => setDetailsOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {person.firstName} {person.lastName}
+                {person.age ? <span className="ml-2 font-light opacity-70">{person.age}</span> : null}
+              </h2>
+              {person.gender && <p className="mt-1 text-sm capitalize opacity-60">{person.gender}</p>}
+              <p className="mt-3 text-sm leading-relaxed opacity-85">{person.about}</p>
+              {Array.isArray(person.skills) && person.skills.length > 0 && (
+                <div className="mt-4">
+                  <p className="mb-2 text-[11px] uppercase tracking-[0.16em] opacity-50">Skills</p>
+                  <div className="flex flex-wrap gap-2">
+                    {person.skills.map((skill) => (
+                      <span key={skill} className="rounded-full bg-base-300 px-3 py-1 text-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
+      </div>
+      <p className="tinder-hint">Tap the photo for profile · Swipe right to like · Swipe left to pass</p>
     </div>
   );
 };

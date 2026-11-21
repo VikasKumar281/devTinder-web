@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useI18n } from "../utils/i18n";
 import { BASE_URL } from "../utils/constants";
-import PageLoader from "./PageLoader";
+import PageLoader, { withMinDelay } from "./PageLoader";
 
 const AnswerSkeleton = () => (
   <div className="border-t border-white/10 px-5 py-5">
@@ -33,9 +33,11 @@ const Support = () => {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get(BASE_URL + "/support/content");
-        setTopics(res.data?.data?.topics || []);
-        setFaqs(res.data?.data?.faqs || []);
+        await withMinDelay(async () => {
+          const res = await axios.get(BASE_URL + "/support/content");
+          setTopics(res.data?.data?.topics || []);
+          setFaqs(res.data?.data?.faqs || []);
+        });
       } catch (err) {
         setError(err.response?.data?.message || "Could not load support content");
       } finally {
