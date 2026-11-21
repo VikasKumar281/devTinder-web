@@ -1,12 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
+import PageLoader from "./PageLoader";
+import EmptyState from "./EmptyState";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(!requests);
 
   const reviewRequest = async (status, _id) => {
     try {
@@ -22,6 +25,7 @@ const Requests = () => {
   };
 
   const fetchRequests = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
@@ -29,6 +33,9 @@ const Requests = () => {
       dispatch(addRequests(res?.data?.data));
     } catch (err) {
       console.error(err);
+      dispatch(addRequests([]));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,14 +43,17 @@ const Requests = () => {
     fetchRequests();
   }, []);
 
-  if (!requests) return null;
+  if (loading || !requests) {
+    return <PageLoader label="Loading requests" variant="list" />;
+  }
 
   if (requests.length === 0) {
     return (
-      <div className="mx-auto my-16 max-w-md px-4 text-center">
-        <h1 className="text-3xl font-semibold">No requests</h1>
-        <p className="mt-2 text-sm opacity-70">New connection requests will land here.</p>
-      </div>
+      <EmptyState
+        emoji="✉"
+        title="No requests"
+        text="New connection requests will land here."
+      />
     );
   }
 
@@ -66,7 +76,7 @@ const Requests = () => {
           return (
             <article
               key={request._id}
-              className="rounded-3xl border border-white/10 bg-base-200 p-4 shadow-lg"
+              className="rounded-3xl border border-white/10 bg-base-200/80 p-4 shadow-lg backdrop-blur transition hover:-translate-y-0.5 hover:border-white/20"
             >
               <div className="flex items-center gap-3">
                 <img

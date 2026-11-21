@@ -5,6 +5,8 @@ import { addUser } from "../utils/userSlice";
 import { clearFeed } from "../utils/feedSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import BrandLogo from "./BrandLogo";
+import { useI18n } from "../utils/i18n";
 
 const passwordChecks = (password) => [
   { label: "8 or more characters", ok: password.length >= 8 },
@@ -19,12 +21,14 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoginForm, setIsLoginForm] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const checks = passwordChecks(password);
 
   const switchMode = (loginMode) => {
@@ -91,105 +95,166 @@ const Login = () => {
     }
   };
 
+  const submit = () => (isLoginForm ? handleLogin() : handleSignUp());
+
   return (
-    <div className="flex min-h-[78vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-base-200 p-8 shadow-2xl">
-        <div className="mb-6 flex items-center gap-3">
-          <img src="/Logo.png" alt="" className="h-12 w-12 rounded-2xl object-cover" />
-          <div>
-            <p className="text-lg font-bold">DevTinder</p>
-            <p className="text-xs opacity-60">Find developers you want to work with</p>
+    <div className="relative mx-auto grid min-h-[calc(100vh-8.5rem)] w-full max-w-6xl overflow-hidden px-4 py-8 lg:grid-cols-2 lg:items-center lg:gap-10 lg:px-8">
+      <section className="relative hidden overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-rose-500/20 via-indigo-500/10 to-transparent p-10 lg:flex lg:min-h-[36rem] lg:flex-col lg:justify-between">
+        <span className="auth-orb h-40 w-40 bg-rose-500/40" style={{ top: "12%", left: "8%" }} />
+        <span className="auth-orb h-28 w-28 bg-indigo-500/40" style={{ right: "12%", top: "28%", animationDelay: "1.2s" }} />
+        <span className="auth-orb h-24 w-24 bg-sky-400/30" style={{ bottom: "16%", left: "28%", animationDelay: "2s" }} />
+        <div>
+          <div className="mb-5 flex items-center gap-3">
+            <BrandLogo size="lg" className="ring-2 ring-white/20" />
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-200/80">DevTinder</p>
+          </div>
+          <h1 className="mt-4 max-w-sm text-5xl font-extrabold leading-[1.05] tracking-tight">
+            {t("heroTitle")}
+          </h1>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/70">
+            {t("heroText")}
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            ["12k+", "developers"],
+            ["8k+", "matches"],
+            ["24/7", "chat"],
+          ].map(([stat, label]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+              <p className="text-xl font-bold">{stat}</p>
+              <p className="text-xs capitalize opacity-60">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-md">
+        <div className="glass-card rounded-[2rem] border border-white/10 p-7 shadow-2xl sm:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <BrandLogo size="lg" className="ring-2 ring-rose-400/40" />
+            <div>
+              <p className="text-lg font-bold">{t("welcome")}</p>
+              <p className="text-xs opacity-60">
+                {isLoginForm ? t("signInHint") : t("signUpHint")}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-6 grid grid-cols-2 rounded-full bg-black/25 p-1">
+            <button
+              type="button"
+              className={`rounded-full py-2.5 text-sm font-semibold ${isLoginForm ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30" : "opacity-70"}`}
+              onClick={() => switchMode(true)}
+            >
+              {t("signIn")}
+            </button>
+            <button
+              type="button"
+              className={`rounded-full py-2.5 text-sm font-semibold ${!isLoginForm ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30" : "opacity-70"}`}
+              onClick={() => switchMode(false)}
+            >
+              {t("signUp")}
+            </button>
+          </div>
+
+          <div
+            className="flex flex-col gap-4"
+            onKeyDown={(event) => {
+              if (event.key === "Enter") submit();
+            }}
+          >
+            {!isLoginForm && (
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+                  {t("firstName")}
+                  <input
+                    type="text"
+                    value={firstName}
+                    placeholder="Aarav"
+                    className="input input-bordered auth-input w-full"
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+                  {t("lastName")}
+                  <input
+                    type="text"
+                    value={lastName}
+                    placeholder="Mehta"
+                    className="input input-bordered auth-input w-full"
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </label>
+              </div>
+            )}
+
+            <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+              {t("email")}
+              <input
+                type="email"
+                value={emailId}
+                placeholder="you@email.com"
+                className="input input-bordered auth-input w-full"
+                onChange={(e) => setEmailId(e.target.value)}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+              {t("password")}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  placeholder={isLoginForm ? "Your password" : "Dev@1234"}
+                  className="input input-bordered auth-input w-full pr-16"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold opacity-70"
+                  onClick={() => setShowPassword((value) => !value)}
+                >
+                  {showPassword ? t("hide") : t("show")}
+                </button>
+              </div>
+            </label>
+
+            {!isLoginForm && (
+              <ul className="grid grid-cols-1 gap-1.5 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs">
+                {checks.map((check) => (
+                  <li key={check.label} className={check.ok ? "text-emerald-400" : "opacity-55"}>
+                    {check.ok ? "✓" : "○"} {check.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {error && (
+              <p className="rounded-2xl border border-rose-400/20 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">
+                {typeof error === "string" ? error : "Something went wrong"}
+              </p>
+            )}
+
+            <button
+              className="btn mt-1 h-12 rounded-full border-none bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30"
+              disabled={loading}
+              onClick={submit}
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="loading loading-spinner loading-sm" />
+                  {t("wait")}
+                </span>
+              ) : isLoginForm ? (
+                t("signIn")
+              ) : (
+                t("createAccount")
+              )}
+            </button>
           </div>
         </div>
-
-        <div className="mb-6 grid grid-cols-2 rounded-full bg-base-300 p-1">
-          <button
-            type="button"
-            className={`rounded-full py-2 text-sm font-medium ${isLoginForm ? "bg-primary text-primary-content" : "opacity-70"}`}
-            onClick={() => switchMode(true)}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            className={`rounded-full py-2 text-sm font-medium ${!isLoginForm ? "bg-primary text-primary-content" : "opacity-70"}`}
-            onClick={() => switchMode(false)}
-          >
-            Sign up
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {!isLoginForm && (
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex flex-col gap-1 text-sm">
-                First name
-                <input
-                  type="text"
-                  value={firstName}
-                  placeholder="Aarav"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-sm">
-                Last name
-                <input
-                  type="text"
-                  value={lastName}
-                  placeholder="Mehta"
-                  className="input input-bordered w-full"
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </label>
-            </div>
-          )}
-
-          <label className="flex flex-col gap-1 text-sm">
-            Email
-            <input
-              type="email"
-              value={emailId}
-              placeholder="you@email.com"
-              className="input input-bordered w-full"
-              onChange={(e) => setEmailId(e.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            Password
-            <input
-              type="password"
-              value={password}
-              placeholder={isLoginForm ? "Your password" : "Dev@1234"}
-              className="input input-bordered w-full"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-
-          {!isLoginForm && (
-            <ul className="grid grid-cols-1 gap-1 text-xs">
-              {checks.map((check) => (
-                <li key={check.label} className={check.ok ? "text-success" : "opacity-60"}>
-                  {check.ok ? "✓" : "○"} {check.label}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {error && (
-            <p className="rounded-xl bg-error/15 px-3 py-2 text-sm text-error">{error}</p>
-          )}
-
-          <button
-            className="btn btn-primary mt-1"
-            disabled={loading}
-            onClick={isLoginForm ? handleLogin : handleSignUp}
-          >
-            {loading ? "Please wait..." : isLoginForm ? "Sign in" : "Create account"}
-          </button>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

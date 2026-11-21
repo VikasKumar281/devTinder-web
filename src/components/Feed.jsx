@@ -4,15 +4,18 @@ import axios from "axios";
 import { addFeed } from "../utils/feedSlice";
 import { useEffect, useState } from "react";
 import UserCard from "./UserCard";
+import PageLoader from "./PageLoader";
+import EmptyState from "./EmptyState";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
-  
   const userId = useSelector((store) => store.user?._id);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [loading, setLoading] = useState(!feed);
 
   const getFeed = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(BASE_URL + "/user/feed", {
         withCredentials: true,
@@ -20,6 +23,9 @@ const Feed = () => {
       dispatch(addFeed(res?.data?.data));
     } catch (err) {
       console.error(err);
+      dispatch(addFeed([]));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,14 +33,17 @@ const Feed = () => {
     if (userId) getFeed();
   }, [userId]);
 
-  if (!feed) return;
+  if (loading || !feed) {
+    return <PageLoader label="Finding developers" variant="card" />;
+  }
 
   if (feed.length <= 0) {
     return (
-      <div className="mx-auto my-16 max-w-md px-4 text-center">
-        <h1 className="text-2xl font-semibold">You are all caught up</h1>
-        <p className="mt-2 text-sm opacity-70">No new developers in your feed right now.</p>
-      </div>
+      <EmptyState
+        emoji="✦"
+        title="You are all caught up"
+        text="No new developers in your feed right now. Check back soon."
+      />
     );
   }
 
@@ -50,7 +59,7 @@ const Feed = () => {
         onSent={() => setDetailsOpen(false)}
       />
       {detailsOpen && (
-        <aside className="flex h-[36rem] w-full max-w-[22rem] flex-col overflow-hidden rounded-[2rem] bg-base-200 shadow-2xl ring-1 ring-white/10">
+        <aside className="flex h-[36rem] w-full max-w-[22rem] flex-col overflow-hidden rounded-[2rem] bg-base-200/90 shadow-2xl ring-1 ring-white/10 backdrop-blur">
           <div className="relative h-3/5 shrink-0">
             <img
               src={person.photoUrl || "/Logo.png"}
