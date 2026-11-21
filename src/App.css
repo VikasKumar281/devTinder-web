@@ -727,6 +727,75 @@ button:disabled,
   border-color: rgba(251, 113, 133, 0.45);
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  outline: none;
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+}
+
+.field textarea {
+  min-height: 7.5rem;
+  border-radius: 1.2rem;
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: rgba(251, 113, 133, 0.7);
+  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15);
+}
+
+.photo-pick {
+  display: inline-flex;
+  align-items: center;
+  height: 2.4rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fb7185, #f59e0b);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.save-profile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fb7185, #f59e0b);
+  color: #fff;
+  font-weight: 800;
+}
+
+.save-profile:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .site-footer-bottom {
   display: flex;
   flex-wrap: wrap;

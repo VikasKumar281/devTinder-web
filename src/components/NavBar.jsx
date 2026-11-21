@@ -27,9 +27,9 @@ const NavBar = () => {
   const { trigger } = useNavSplash();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [requestNotes, setRequestNotes] = useState([]);
-  const [chatNotes, setChatNotes] = useState([]);
-  const [seen, setSeen] = useState({});
+  const [notes, setNotes] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
   const itemClass = (path) =>
     `rounded-xl ${location.pathname === path ? "bg-primary/15 text-primary" : ""}`;
 
@@ -59,39 +59,29 @@ const NavBar = () => {
     if (!user) return;
     const loadNotes = async () => {
       try {
-        const [requestsRes, chatsRes] = await Promise.all([
-          axios.get(BASE_URL + "/user/requests/received", { withCredentials: true }),
-          axios.get(BASE_URL + "/chat/notifications", { withCredentials: true }),
-        ]);
-        setRequestNotes(requestsRes.data.data || []);
-        setChatNotes(chatsRes.data.data || []);
+        const res = await axios.get(BASE_URL + "/notifications", {
+          withCredentials: true,
+        });
+        setNotes(res.data.data || []);
+        setUnreadCount(res.data.unread || 0);
       } catch (err) {
-        setRequestNotes([]);
-        setChatNotes([]);
+        setNotes([]);
+        setUnreadCount(0);
       }
     };
     loadNotes();
-    const timer = setInterval(loadNotes, 20000);
+    const timer = setInterval(loadNotes, 12000);
     return () => clearInterval(timer);
   }, [user]);
 
-  const requestKey = (note) => "request-" + note._id;
-  const chatKey = (note) => "chat-" + note.userId + "-" + note.text;
-  const unreadCount =
-    requestNotes.filter((note) => !seen[requestKey(note)]).length +
-    chatNotes.filter((note) => !seen[chatKey(note)]).length;
-
-  const markNotificationsRead = () => {
-    setSeen((prev) => {
-      const next = { ...prev };
-      requestNotes.forEach((note) => {
-        next[requestKey(note)] = true;
-      });
-      chatNotes.forEach((note) => {
-        next[chatKey(note)] = true;
-      });
-      return next;
-    });
+  const markNotificationsRead = async () => {
+    setUnreadCount(0);
+    try {
+      await axios.post(BASE_URL + "/notifications/read", {}, { withCredentials: true });
+      setNotes((prev) => prev.map((note) => ({ ...note, read: true })));
+    } catch (err) {
+      /* keep list visible even if mark-read fails */
+    }
   };
 
   const closeMenu = () => {
@@ -230,98 +220,68 @@ const NavBar = () => {
 
           {user && (
             <>
-              <div className="dropdown dropdown-end">
+              <div className="relative">
                 <button
                   type="button"
-                  tabIndex={0}
                   className="nav-icon-btn relative"
                   aria-label={t("notifications")}
-                  onMouseDown={markNotificationsRead}
-                  onClick={markNotificationsRead}
+                  onClick={() => {
+                    setNotesOpen((open) => !open);
+                    markNotificationsRead();
+                  }}
                 >
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M6 9a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />
                     <path d="M10 20a2 2 0 0 0 4 0" />
                   </svg>
                   {unreadCount > 0 && (
-                    <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] text-white">
+                    <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
                       {unreadCount}
                     </span>
                   )}
                 </button>
-                <div
-                  tabIndex={0}
-                  className="dropdown-content z-[40] mt-3 max-h-96 w-80 overflow-y-auto rounded-2xl border border-white/10 bg-neutral-950 p-3 shadow-2xl"
-                >
-                  <p className="px-1 pb-2 text-sm font-semibold">{t("notifications")}</p>
-                  {requestNotes.length === 0 && chatNotes.length === 0 && (
-                    <p className="px-1 py-3 text-sm opacity-60">{t("caughtUp")}</p>
-                  )}
-                  {requestNotes.length > 0 && (
-                    <p className="px-2 pb-1 text-[11px] uppercase tracking-wide opacity-50">{t("requests")}</p>
-                  )}
-                  {requestNotes.map((note) => (
-                    <button
-                      key={note._id}
-                      type="button"
-                      className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/10"
-                      onClick={() => {
-                    closeMenu();
-                    trigger();
-                    navigate("/requests");
-                      }}
-                    >
-                      <img
-                        src={note.fromUserId?.photoUrl || "/Logo.png"}
-                        alt=""
-                        className="h-9 w-9 rounded-full object-cover"
-                      />
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium">
-                          {note.fromUserId?.firstName} {t("sentRequest")}
-                        </span>
-                        <span className="text-xs opacity-60">{t("tapReview")}</span>
-                      </span>
-                    </button>
-                  ))}
-                  {chatNotes.length > 0 && (
-                    <p className="px-2 pb-1 pt-2 text-[11px] uppercase tracking-wide opacity-50">
-                      {t("messages")}
-                    </p>
-                  )}
-                  {chatNotes.map((note) => (
-                    <button
-                      key={note.userId}
-                      type="button"
-                      className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/10"
-                      onClick={() => {
-                    closeMenu();
-                    trigger();
-                    navigate("/chat/" + note.userId);
-                      }}
-                    >
-                      <img
-                        src={note.photoUrl || "/Logo.png"}
-                        alt=""
-                        className="h-9 w-9 rounded-full object-cover"
-                      />
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium">
-                          {note.firstName} {note.lastName}
-                        </span>
-                        <span className="block truncate text-xs opacity-60">{note.text}</span>
-                      </span>
-                    </button>
-                  ))}
-                  <div className="mt-2 flex gap-2 sm:hidden">
-                    <Link to="/support" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={() => { trigger(); closeMenu(); }}>
-                      {t("support")}
-                    </Link>
-                    <Link to="/contact" className="btn btn-ghost btn-sm flex-1 rounded-full" onClick={() => { trigger(); closeMenu(); }}>
-                      {t("contact")}
-                    </Link>
+                {notesOpen && (
+                  <div className="absolute right-0 z-[60] mt-3 w-[min(22rem,86vw)] overflow-hidden rounded-2xl border border-white/10 bg-neutral-950 p-3 shadow-2xl">
+                    <div className="mb-2 flex items-center justify-between px-1">
+                      <p className="text-sm font-semibold">{t("notifications")}</p>
+                      <button type="button" className="text-xs opacity-50" onClick={() => setNotesOpen(false)}>
+                        Close
+                      </button>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {notes.length === 0 && (
+                        <p className="px-1 py-6 text-center text-sm opacity-60">{t("caughtUp")}</p>
+                      )}
+                      {notes.map((note) => (
+                        <button
+                          key={note._id}
+                          type="button"
+                          className={
+                            "mb-1 flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/10 " +
+                            (note.read ? "opacity-70" : "")
+                          }
+                          onClick={() => {
+                            setNotesOpen(false);
+                            trigger();
+                            navigate(note.link || "/feed");
+                          }}
+                        >
+                          <img
+                            src={note.photoUrl || note.fromUserId?.photoUrl || "/Logo.png"}
+                            alt=""
+                            className="h-10 w-10 rounded-full object-cover"
+                          />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold">{note.title}</span>
+                            {note.body && (
+                              <span className="mt-0.5 block truncate text-xs opacity-60">{note.body}</span>
+                            )}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div className="dropdown dropdown-end">
                 <div

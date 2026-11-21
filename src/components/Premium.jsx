@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../utils/userSlice";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import PageLoader, { withMinDelay } from "./PageLoader";
@@ -68,6 +69,7 @@ const stories = [
 const Premium = () => {
   const { t } = useI18n();
   const user = useSelector((store) => store.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState(fallbackPlans);
@@ -88,10 +90,12 @@ const Premium = () => {
           setStripeReady(Boolean(res.data?.data?.stripeReady));
           if (user) {
             try {
-              const status = await axios.get(BASE_URL + "/premium/status", {
-                withCredentials: true,
-              });
+              const [status, profile] = await Promise.all([
+                axios.get(BASE_URL + "/premium/status", { withCredentials: true }),
+                axios.get(BASE_URL + "/profile/view", { withCredentials: true }),
+              ]);
               setStatusPlan(status.data?.data?.membershipType || "free");
+              dispatch(addUser(profile.data));
             } catch {
               setStatusPlan(user.membershipType || "free");
             }
@@ -104,7 +108,7 @@ const Premium = () => {
       }
     };
     load();
-  }, [user]);
+  }, [user?._id, dispatch]);
 
   const buy = async (planId) => {
     setError("");

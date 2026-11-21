@@ -11,7 +11,7 @@ const toSkillList = (value) =>
     .map((skill) => skill.trim())
     .filter(Boolean);
 
-const EditProfile = ({ user }) => {
+const EditProfile = ({ user, membership }) => {
   const [firstName, setFirstName] = useState(user.firstName);
   const [emailId, setEmailId] = useState(user.emailId || "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -141,68 +141,54 @@ const EditProfile = ({ user }) => {
     }
   };
 
+  const plan = membership?.plan;
+  const purchases = membership?.purchases || [];
+
   return (
     <>
-      <div className="mx-auto my-8 flex w-full max-w-6xl flex-col items-start justify-center gap-8 px-4 lg:flex-row">
-        <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-base-200 p-6 shadow-xl">
+      <div className="mt-8 flex w-full flex-col items-start justify-center gap-8 lg:flex-row">
+        <div className="w-full max-w-xl rounded-[1.8rem] border border-white/10 bg-[#121218]/90 p-6 shadow-2xl sm:p-7">
           <div className="flex flex-col gap-5">
             <div>
-              <p className="text-xs uppercase tracking-wide opacity-50">Your profile</p>
-              <h2 className="text-2xl font-semibold">Edit profile</h2>
-              <p className="mt-1 text-sm opacity-60">First name needs at least 2 characters.</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">Your profile</p>
+              <h2 className="mt-1 text-3xl font-extrabold tracking-tight">Edit profile</h2>
+              <p className="mt-1 text-sm text-white/50">Changes save to your account. First name needs at least 2 characters.</p>
             </div>
 
-            <label className="form-control w-full">
-              <span className="label-text mb-1">Email</span>
-              <input
-                type="email"
-                value={emailId}
-                className="input input-bordered w-full rounded-full"
-                onChange={(e) => setEmailId(e.target.value)}
-              />
-            </label>
-
-            {user?.isPremium && user?.membershipType && user.membershipType !== "free" && (
-              <p className="rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-2 text-sm font-semibold capitalize text-amber-200">
-                {user.membershipType} membership
-              </p>
+            {plan && (
+              <div className="rounded-2xl border border-amber-300/25 bg-amber-400/10 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-200">Membership</p>
+                <p className="mt-1 text-xl font-extrabold">{plan.name}</p>
+                <p className="text-sm opacity-70">{plan.tagline}</p>
+                <p className="mt-2 text-sm font-semibold">
+                  {plan.displayPrice}/{plan.period}
+                  {membership?.membershipExpiresAt
+                    ? " · renews " + new Date(membership.membershipExpiresAt).toLocaleDateString()
+                    : ""}
+                </p>
+              </div>
             )}
+
+            <label className="field">
+              <span>Email</span>
+              <input type="email" value={emailId} onChange={(e) => setEmailId(e.target.value)} />
+            </label>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="form-control w-full">
-                <span className="label-text mb-1">First name</span>
-                <input
-                  type="text"
-                  value={firstName}
-                  className="input input-bordered w-full rounded-full"
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
+              <label className="field">
+                <span>First name</span>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
               </label>
-              <label className="form-control w-full">
-                <span className="label-text mb-1">Last name</span>
-                <input
-                  type="text"
-                  value={lastName}
-                  className="input input-bordered w-full rounded-full"
-                  onChange={(e) => setLastName(e.target.value)}
-                />
+              <label className="field">
+                <span>Last name</span>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
               </label>
-              <label className="form-control w-full">
-                <span className="label-text mb-1">Age</span>
-                <input
-                  type="number"
-                  min="18"
-                  value={age}
-                  className="input input-bordered w-full rounded-full"
-                  onChange={(e) => setAge(e.target.value)}
-                />
+              <label className="field">
+                <span>Age</span>
+                <input type="number" min="18" value={age} onChange={(e) => setAge(e.target.value)} />
               </label>
-              <label className="form-control w-full">
-                <span className="label-text mb-1">Gender</span>
-                <select
-                  value={gender}
-                  className="select select-bordered w-full rounded-full"
-                  onChange={(e) => setGender(e.target.value)}
-                >
+              <label className="field">
+                <span>Gender</span>
+                <select value={gender} onChange={(e) => setGender(e.target.value)}>
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -211,53 +197,41 @@ const EditProfile = ({ user }) => {
               </label>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-3">
               <img
                 src={photoUrl || "/Logo.png"}
                 alt="Selected profile"
-                className="h-20 w-20 rounded-full object-cover"
+                className="h-20 w-20 rounded-2xl object-cover"
               />
               <div>
-                <p className="mb-2 text-sm">Profile photo</p>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="block w-full max-w-xs cursor-pointer text-sm file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-content hover:file:opacity-90"
-                  onChange={choosePhoto}
-                />
-                <p className="mt-2 text-xs opacity-60">
-                  {saving
-                    ? "Saving photo in the database..."
-                    : "JPG, PNG, or WEBP up to 10 MB. Press Save profile to store it."}
+                <p className="text-sm font-semibold">Profile photo</p>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={choosePhoto} />
+                <button type="button" className="photo-pick mt-2" onClick={() => fileRef.current?.click()}>
+                  Choose photo
+                </button>
+                <p className="mt-2 text-xs text-white/45">
+                  {saving ? "Saving to your account..." : "JPG, PNG, or WEBP up to 10 MB."}
                 </p>
-                {error && <p className="mt-2 max-w-xs text-sm text-error">{error}</p>}
               </div>
             </div>
 
-            <label className="form-control w-full">
-              <span className="label-text mb-1">About</span>
-              <textarea
-                value={about}
-                className="textarea textarea-bordered min-h-28 w-full rounded-3xl"
-                onChange={(e) => setAbout(e.target.value)}
-              />
+            <label className="field">
+              <span>About</span>
+              <textarea value={about} onChange={(e) => setAbout(e.target.value)} />
             </label>
 
-            <label className="form-control w-full">
-              <span className="label-text mb-1">Skills</span>
+            <label className="field">
+              <span>Skills</span>
               <input
                 type="text"
                 value={skills}
                 placeholder="React, Node, MongoDB"
-                className="input input-bordered w-full rounded-full"
                 onChange={(e) => setSkills(e.target.value)}
               />
-              <span className="mt-1 text-xs opacity-60">Separate skills with commas.</span>
               {skillList.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {skillList.map((skill) => (
-                    <span key={skill} className="badge badge-primary badge-outline">
+                    <span key={skill} className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs">
                       {skill}
                     </span>
                   ))}
@@ -265,30 +239,21 @@ const EditProfile = ({ user }) => {
               )}
             </label>
 
-            <div className="rounded-2xl border border-white/10 p-4">
-              <p className="mb-3 text-sm font-medium">Password</p>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="mb-3 text-sm font-semibold">Password</p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <input
-                  type="password"
-                  value={currentPassword}
-                  placeholder="Current password"
-                  className="input input-bordered w-full rounded-full"
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                />
-                <input
-                  type="password"
-                  value={newPassword}
-                  placeholder="New password"
-                  className="input input-bordered w-full rounded-full"
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
+                <label className="field">
+                  <span>Current</span>
+                  <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                </label>
+                <label className="field">
+                  <span>New</span>
+                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                </label>
               </div>
-              <p className="mt-2 text-xs opacity-60">
-                8+ characters with uppercase, lowercase, a number, and a symbol.
-              </p>
               <button
                 type="button"
-                className="btn btn-outline btn-sm mt-3 rounded-full"
+                className="photo-pick mt-3"
                 onClick={updatePassword}
                 disabled={saving || !currentPassword || !newPassword}
               >
@@ -296,29 +261,40 @@ const EditProfile = ({ user }) => {
               </button>
             </div>
 
-            {error && <p className="text-sm text-error">{error}</p>}
+            {error && (
+              <p className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+                {typeof error === "string" ? error : "Could not save"}
+              </p>
+            )}
             <div className="flex justify-end">
-              <button
-                className={
-                  changed
-                    ? "btn btn-primary rounded-full px-6"
-                    : "btn rounded-full border-base-300 bg-base-300 px-6 text-base-content/70"
-                }
-                onClick={saveProfile}
-                disabled={!changed || saving}
-              >
+              <button type="button" className="save-profile" onClick={saveProfile} disabled={!changed || saving}>
                 {saving ? "Saving..." : "Save profile"}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="w-full max-w-sm">
-          <p className="mb-3 text-sm font-medium opacity-70">Preview</p>
+        <div className="w-full max-w-sm space-y-4">
+          <p className="text-sm font-medium opacity-70">Preview</p>
           <UserCard
             user={{ firstName, lastName, photoUrl, age, gender, about, skills: skillList }}
             showActions={false}
           />
+          {purchases.length > 0 && (
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/5 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] opacity-50">Stored in database</p>
+              <ul className="mt-3 space-y-2 text-sm">
+                {purchases.map((item) => (
+                  <li key={item._id} className="flex items-center justify-between gap-2">
+                    <span className="capitalize font-semibold">{item.plan}</span>
+                    <span className="text-xs opacity-55">
+                      {item.status} · {new Date(item.createdAt).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
