@@ -65,7 +65,7 @@ const Connections = () => {
           return (
             <article
               key={_id}
-              className="rounded-3xl border border-white/10 bg-base-200/80 p-4 shadow-lg backdrop-blur transition hover:-translate-y-0.5 hover:border-white/20"
+              className="hover-lift rounded-3xl border border-white/10 bg-base-200/80 p-4 shadow-lg backdrop-blur"
             >
               <div className="flex items-center gap-3">
                 <img

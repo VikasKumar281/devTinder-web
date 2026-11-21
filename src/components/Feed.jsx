@@ -57,7 +57,24 @@ const Feed = () => {
   const stack = feed.slice(0, 3);
 
   return (
-    <div className="tinder-feed">
+    <div className="page-align tinder-feed">
+      <aside className="feed-rail">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-rose-300">Discover</p>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Today’s stack</h1>
+        <p className="mt-2 text-sm leading-relaxed text-white/55">
+          {feed.length} developer{feed.length === 1 ? "" : "s"} left. Swipe right to connect, left to pass.
+        </p>
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-2xl font-extrabold">{feed.length}</p>
+            <p className="text-xs text-white/50">In queue</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+            <p className="text-2xl font-extrabold">{person.skills?.length || 0}</p>
+            <p className="text-xs text-white/50">Skills shown</p>
+          </div>
+        </div>
+      </aside>
       <div className="tinder-stage">
         <div className="tinder-deck">
           {stack

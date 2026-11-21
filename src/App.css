@@ -236,6 +236,12 @@ button:disabled,
   backdrop-filter: blur(22px);
 }
 
+.page-align {
+  box-sizing: border-box;
+  width: min(90rem, calc(100% - 1.4rem));
+  margin: 1.25rem auto 2.5rem;
+}
+
 .site-nav-brand {
   display: flex;
   align-items: center;
@@ -391,15 +397,18 @@ button:disabled,
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
 }
 
-.support-card {
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+.support-card,
+.faq-card,
+.hover-lift {
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease;
 }
 
-.support-card:hover {
-  transform: translateY(-8px);
+.support-card:hover,
+.faq-card:hover,
+.hover-lift:hover {
+  transform: translateY(-10px);
   border-color: rgba(251, 113, 133, 0.45);
-  box-shadow: 0 18px 40px rgba(244, 63, 94, 0.18);
-  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 44px rgba(244, 63, 94, 0.2);
 }
 
 .faq-card {
@@ -464,10 +473,17 @@ button:disabled,
 .tinder-feed {
   display: flex;
   min-height: calc(100vh - 9rem);
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 1rem 2rem;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+
+.feed-rail {
+  width: min(18rem, 100%);
+  align-self: center;
 }
 
 .tinder-stage {

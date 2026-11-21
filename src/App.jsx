@@ -18,6 +18,7 @@ const Support = lazy(() => import("./components/Support"));
 const Contact = lazy(() => import("./components/Contact"));
 const Premium = lazy(() => import("./components/Premium"));
 const PremiumSuccess = lazy(() => import("./components/PremiumSuccess"));
+const ResetPassword = lazy(() => import("./components/ResetPassword"));
 
 
 // function App() {
@@ -53,6 +54,7 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/support" element={<Support />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/premium" element={<Premium />} />

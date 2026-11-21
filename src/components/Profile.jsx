@@ -43,8 +43,8 @@ const Profile = () => {
   const expires = status?.membershipExpiresAt || user.membershipExpiresAt;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-rose-500/20 via-[#151018] to-amber-400/10 p-6 sm:p-8">
+    <div className="page-align">
+      <section className="hover-lift relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-rose-500/20 via-[#151018] to-amber-400/10 p-6 sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <img
             src={user.photoUrl || "/Logo.png"}

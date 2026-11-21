@@ -90,7 +90,7 @@ const Contact = () => {
   if (loading) return <PageLoader label="Loading contact" />;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10">
+    <div className="page-align">
       <section className="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-rose-500/25 via-[#1a1020] to-indigo-500/20 px-6 py-10 sm:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-300">{t("contact")}</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-6xl">{t("contactTitle")}</h1>

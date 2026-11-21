@@ -146,8 +146,8 @@ const EditProfile = ({ user, membership }) => {
 
   return (
     <>
-      <div className="mt-8 flex w-full flex-col items-start justify-center gap-8 lg:flex-row">
-        <div className="w-full max-w-xl rounded-[1.8rem] border border-white/10 bg-[#121218]/90 p-6 shadow-2xl sm:p-7">
+      <div className="mt-5 flex w-full flex-col items-stretch gap-5 lg:flex-row">
+        <div className="hover-lift min-w-0 flex-1 rounded-[1.8rem] border border-white/10 bg-[#121218]/90 p-6 shadow-2xl sm:p-7">
           <div className="flex flex-col gap-5">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">Your profile</p>
@@ -274,7 +274,7 @@ const EditProfile = ({ user, membership }) => {
           </div>
         </div>
 
-        <div className="w-full max-w-sm space-y-4">
+        <div className="w-full shrink-0 space-y-4 lg:w-[24rem]">
           <p className="text-sm font-medium opacity-70">Preview</p>
           <UserCard
             user={{ firstName, lastName, photoUrl, age, gender, about, skills: skillList }}
