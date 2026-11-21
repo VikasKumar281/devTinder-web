@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -30,8 +30,27 @@ const NavBar = () => {
   const [notes, setNotes] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
+  const notesRef = useRef(null);
   const itemClass = (path) =>
     `rounded-xl ${location.pathname === path ? "bg-primary/15 text-primary" : ""}`;
+
+  useEffect(() => {
+    if (!notesOpen) return;
+    const close = (event) => {
+      if (notesRef.current && !notesRef.current.contains(event.target)) {
+        setNotesOpen(false);
+      }
+    };
+    const onKey = (event) => {
+      if (event.key === "Escape") setNotesOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [notesOpen]);
 
   useEffect(() => {
     const name = searchText.trim();
@@ -220,7 +239,7 @@ const NavBar = () => {
 
           {user && (
             <>
-              <div className="relative">
+              <div className="relative" ref={notesRef}>
                 <button
                   type="button"
                   className="nav-icon-btn relative"

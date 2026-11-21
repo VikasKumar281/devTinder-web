@@ -140,8 +140,8 @@ const Premium = () => {
   if (loading) return <PageLoader label="Loading plans" />;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <section className="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-amber-400/20 via-[#1a1020] to-rose-500/20 px-6 py-12 sm:px-10">
+    <div className="page-align">
+      <section className="hover-lift relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-amber-400/20 via-[#1a1020] to-rose-500/20 px-6 py-12 sm:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200">{t("plans")}</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-6xl">
           More control over how you connect.

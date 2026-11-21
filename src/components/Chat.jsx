@@ -98,23 +98,24 @@ const Chat = () => {
   if (loading) return <PageLoader label="Loading chat" />;
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-8.5rem)] w-full max-w-2xl flex-col px-4 py-4">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-base-200 shadow-xl">
-        <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+    <div className="page-align flex h-[calc(100vh-8.5rem)] flex-col">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#121218]/90 shadow-2xl">
+        <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
           <img
             src={person?.photoUrl || "/Logo.png"}
             alt=""
-            className="h-10 w-10 rounded-full object-cover"
+            className="h-12 w-12 rounded-2xl object-cover ring-1 ring-white/15"
           />
           <div>
-            <h1 className="font-semibold leading-tight">{title}</h1>
-            <p className="text-xs opacity-50">Messages stay in this chat</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-rose-300">Chat</p>
+            <h1 className="text-lg font-extrabold leading-tight">{title}</h1>
+            <p className="text-xs text-white/45">Messages stay in this chat</p>
           </div>
         </div>
 
-        <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+        <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5">
           {messages.length === 0 && (
-            <p className="m-auto text-sm opacity-50">Say hi to start the chat.</p>
+            <p className="m-auto text-sm text-white/45">Say hi to start the chat.</p>
           )}
           {messages.map((msg, index) => {
             const mine = msg.senderId
@@ -122,18 +123,18 @@ const Chat = () => {
               : user.firstName === msg.firstName;
             return (
               <div key={index} className={"flex " + (mine ? "justify-end" : "justify-start")}>
-                <div className={"max-w-[75%] " + (mine ? "items-end" : "items-start")}>
+                <div className="max-w-[75%]">
                   {!mine && (
-                    <p className="mb-1 px-1 text-xs opacity-50">
+                    <p className="mb-1 px-1 text-xs text-white/45">
                       {msg.firstName} {msg.lastName}
                     </p>
                   )}
                   <p
                     className={
-                      "rounded-2xl px-3 py-2 text-sm " +
+                      "px-4 py-2.5 text-sm leading-relaxed " +
                       (mine
-                        ? "rounded-br-md bg-primary text-primary-content"
-                        : "rounded-bl-md bg-base-300")
+                        ? "rounded-2xl rounded-br-md bg-gradient-to-r from-rose-500 to-amber-400 text-white"
+                        : "rounded-2xl rounded-bl-md border border-white/10 bg-white/10 text-white")
                     }
                   >
                     {msg.text}
@@ -144,23 +145,23 @@ const Chat = () => {
           })}
         </div>
 
-        <div className="flex items-center gap-2 border-t border-white/10 p-3">
+        <form
+          className="flex items-center gap-2 border-t border-white/10 p-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            sendMessage();
+          }}
+        >
           <input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") sendMessage();
-            }}
             placeholder="Write a message"
-            className="input input-bordered h-11 flex-1 rounded-full"
+            className="h-12 flex-1 rounded-full border border-white/10 bg-white/5 px-4 text-sm outline-none focus:border-rose-400/70 focus:shadow-[0_0_0_4px_rgba(244,63,94,0.15)]"
           />
-          <button
-            onClick={sendMessage}
-            className="btn btn-primary h-11 rounded-full px-5 transition hover:brightness-110"
-          >
+          <button type="submit" className="save-profile h-12 px-6">
             Send
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

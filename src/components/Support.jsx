@@ -73,7 +73,7 @@ const Support = () => {
   if (loading) return <PageLoader label="Loading support" />;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-12">
+    <div className="page-align">
       <div className="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-rose-500/20 via-transparent to-indigo-500/10 px-6 py-10 sm:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-rose-300">{t("support")}</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">{t("supportTitle")}</h1>

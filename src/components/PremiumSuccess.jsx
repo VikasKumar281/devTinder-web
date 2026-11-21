@@ -6,6 +6,21 @@ import { BASE_URL } from "../utils/constants";
 import PageLoader, { withMinDelay } from "./PageLoader";
 import { addUser } from "../utils/userSlice";
 
+const copy = {
+  pulse: {
+    name: "Pulse",
+    line: "Unlimited likes, undo, and a quieter feed are on.",
+  },
+  aura: {
+    name: "Aura",
+    line: "You can see who liked you first, plus Super Pings and a monthly Boost.",
+  },
+  orbit: {
+    name: "Orbit",
+    line: "Your likes jump the queue, and you can send a note before a match.",
+  },
+};
+
 const PremiumSuccess = () => {
   const dispatch = useDispatch();
   const [params] = useSearchParams();
@@ -43,23 +58,54 @@ const PremiumSuccess = () => {
 
   if (loading) return <PageLoader label="Confirming payment" />;
 
+  const details = copy[plan] || null;
+
   return (
-    <div className="mx-auto max-w-lg px-4 py-16 text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200">DevTinder</p>
-      <h1 className="mt-3 text-4xl font-extrabold">You’re in.</h1>
-      <p className="mt-3 text-sm leading-relaxed opacity-70">
-        {error ||
-          (plan
-            ? `Your ${plan} plan is active. Enjoy the extra reach on Feed.`
-            : "Thanks. Your membership will show on your profile in a few seconds.")}
-      </p>
-      <div className="mt-8 flex justify-center gap-3">
-        <Link to="/feed" className="btn rounded-full border-none bg-rose-500 text-white">
-          Open feed
-        </Link>
-        <Link to="/premium" className="btn btn-ghost rounded-full border border-white/15">
-          View plans
-        </Link>
+    <div className="page-align">
+      <section className="hover-lift relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-amber-400/25 via-[#161018] to-rose-500/25 px-6 py-14 text-center sm:px-12">
+        <p className="text-xs font-bold uppercase tracking-[0.32em] text-amber-200">Payment confirmed</p>
+        <h1 className="mt-4 text-5xl font-extrabold tracking-tight sm:text-6xl">You’re in.</h1>
+        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/70">
+          {error ||
+            (details
+              ? `${details.name} is active on this account. ${details.line}`
+              : "Thanks. Your membership will show on your profile in a few seconds.")}
+        </p>
+        {details && !error && (
+          <p className="mt-6 inline-flex rounded-full border border-amber-300/30 bg-amber-400/15 px-5 py-2 text-sm font-semibold text-amber-100">
+            {details.name} membership
+          </p>
+        )}
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link to="/feed" className="site-footer-cta">
+            Open feed
+          </Link>
+          <Link
+            to="/profile"
+            className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold"
+          >
+            View profile
+          </Link>
+          <Link
+            to="/premium"
+            className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold"
+          >
+            View plans
+          </Link>
+        </div>
+      </section>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        {[
+          { title: "Saved", text: "Your plan is stored on your account and shows on Profile." },
+          { title: "Feed", text: "Go back to swiping with the extras that come with this plan." },
+          { title: "Cancel", text: "You can cancel anytime from the Stripe receipt in your email." },
+        ].map((item) => (
+          <article key={item.title} className="hover-lift rounded-3xl border border-white/10 bg-white/5 p-5">
+            <h2 className="text-lg font-semibold">{item.title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">{item.text}</p>
+          </article>
+        ))}
       </div>
     </div>
   );

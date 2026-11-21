@@ -90,7 +90,7 @@ const Contact = () => {
   if (loading) return <PageLoader label="Loading contact" />;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10">
+    <div className="page-align">
       <section className="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-rose-500/25 via-[#1a1020] to-indigo-500/20 px-6 py-10 sm:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-300">{t("contact")}</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-6xl">{t("contactTitle")}</h1>
@@ -168,39 +168,36 @@ const Contact = () => {
           ) : (
             <form
               onSubmit={submit}
-              className="grid gap-4 rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-6 shadow-2xl sm:p-8"
+              className="grid gap-4 rounded-[1.8rem] border border-white/10 bg-[#121218]/90 p-6 shadow-2xl sm:p-8"
             >
-              <p className="text-lg font-semibold">Send a message</p>
-              <p className="text-sm opacity-60">We reply to the email you enter below.</p>
-              <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                {t("name")}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-rose-300">Inbox</p>
+                <p className="mt-1 text-2xl font-extrabold">Send a message</p>
+                <p className="mt-1 text-sm text-white/50">We reply to the email you enter below.</p>
+              </div>
+              <label className="field">
+                <span>{t("name")}</span>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="input input-bordered h-12 rounded-full bg-black/25"
                   required
                   minLength={2}
                   placeholder="Your name"
                 />
               </label>
-              <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                {t("email")}
+              <label className="field">
+                <span>{t("email")}</span>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input input-bordered h-12 rounded-full bg-black/25"
                   required
                   placeholder="you@email.com"
                 />
               </label>
-              <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                Topic
-                <select
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  className="select select-bordered h-12 rounded-full bg-black/25"
-                >
+              <label className="field">
+                <span>Topic</span>
+                <select value={topic} onChange={(e) => setTopic(e.target.value)}>
                   {topics.map((item) => (
                     <option key={item} value={item}>
                       {item}
@@ -208,15 +205,14 @@ const Contact = () => {
                   ))}
                 </select>
               </label>
-              <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                {t("message")}
+              <label className="field">
+                <span>{t("message")}</span>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="textarea textarea-bordered min-h-36 rounded-3xl bg-black/25"
                   required
                   minLength={10}
-                  placeholder="What happened? Include names, the page, and any error text."
+                  placeholder="What happened? Include the page and any error text."
                 />
               </label>
               {error && (
@@ -224,10 +220,7 @@ const Contact = () => {
                   {error}
                 </p>
               )}
-              <button
-                className="btn mt-1 h-12 rounded-full border-none bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30"
-                disabled={saving}
-              >
+              <button type="submit" className="save-profile mt-1 h-12 w-full" disabled={saving}>
                 {saving ? t("wait") : t("send")}
               </button>
             </form>

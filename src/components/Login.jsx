@@ -26,6 +26,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoginForm, setIsLoginForm] = useState(true);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [notice, setNotice] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,7 +36,27 @@ const Login = () => {
 
   const switchMode = (loginMode) => {
     setError("");
+    setNotice("");
+    setForgotMode(false);
     setIsLoginForm(loginMode);
+  };
+
+  const sendReset = async () => {
+    setError("");
+    setNotice("");
+    if (!emailId.trim()) {
+      setError("Email is required");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post(BASE_URL + "/auth/forgot", { emailId: emailId.trim() });
+      setNotice(res.data?.message || "Check your inbox for the reset link.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not send reset email");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const finishGoogle = useCallback(
@@ -227,6 +249,7 @@ const Login = () => {
               />
             </label>
 
+            {!forgotMode && (
             <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
               {t("password")}
               <div className="relative">
@@ -246,8 +269,23 @@ const Login = () => {
                 </button>
               </div>
             </label>
+            )}
 
-            <div className={"auth-reveal " + (!isLoginForm ? "open" : "")}>
+            {isLoginForm && !forgotMode && (
+              <button
+                type="button"
+                className="self-end text-xs font-semibold text-rose-300"
+                onClick={() => {
+                  setError("");
+                  setNotice("");
+                  setForgotMode(true);
+                }}
+              >
+                Forgot password?
+              </button>
+            )}
+
+            <div className={"auth-reveal " + (!isLoginForm && !forgotMode ? "open" : "")}>
               <div className="auth-reveal-inner">
                 <ul className="grid grid-cols-1 gap-1.5 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs">
                   {checks.map((check) => (
@@ -264,17 +302,24 @@ const Login = () => {
                 {typeof error === "string" ? error : "Something went wrong"}
               </p>
             )}
+            {notice && (
+              <p className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+                {notice}
+              </p>
+            )}
 
             <button
               className="btn mt-1 h-12 rounded-full border-none bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30"
               disabled={loading}
-              onClick={submit}
+              onClick={forgotMode ? sendReset : submit}
             >
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="loading loading-spinner loading-sm" />
                   {t("wait")}
                 </span>
+              ) : forgotMode ? (
+                "Send reset link"
               ) : isLoginForm ? (
                 t("signIn")
               ) : (

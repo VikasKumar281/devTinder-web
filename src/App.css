@@ -236,6 +236,12 @@ button:disabled,
   backdrop-filter: blur(22px);
 }
 
+.page-align {
+  box-sizing: border-box;
+  width: min(90rem, calc(100% - 1.4rem));
+  margin: 1.25rem auto 2.5rem;
+}
+
 .site-nav-brand {
   display: flex;
   align-items: center;
@@ -391,15 +397,18 @@ button:disabled,
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
 }
 
-.support-card {
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+.support-card,
+.faq-card,
+.hover-lift {
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.32s ease, box-shadow 0.32s ease, background 0.32s ease;
 }
 
-.support-card:hover {
-  transform: translateY(-8px);
+.support-card:hover,
+.faq-card:hover,
+.hover-lift:hover {
+  transform: translateY(-10px);
   border-color: rgba(251, 113, 133, 0.45);
-  box-shadow: 0 18px 40px rgba(244, 63, 94, 0.18);
-  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 44px rgba(244, 63, 94, 0.2);
 }
 
 .faq-card {
@@ -462,29 +471,117 @@ button:disabled,
 }
 
 .tinder-feed {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 24rem 1fr 28rem;
+  align-items: start;
+  column-gap: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.tinder-feed .tinder-stage {
+  grid-column: 2;
+  margin-right: 0;
+}
+
+.tinder-feed .feed-side {
+  grid-column: 4;
+}
+
+.tinder-feed.feed-details {
+  grid-template-columns: 1fr 24rem 24rem 0.65fr 28rem;
+  column-gap: 1.35rem;
+  padding-left: 0;
+}
+
+.tinder-feed.feed-details .tinder-stage {
+  grid-column: 2;
+  width: 24rem;
+  min-width: 24rem;
+}
+
+.tinder-feed.feed-details .tinder-deck,
+.tinder-feed.feed-details .tinder-card {
+  width: 24rem;
+  height: 44rem;
+}
+
+.tinder-feed.feed-details .feed-info-card {
+  grid-column: 3;
+  width: 24rem;
+  height: 44rem;
+}
+
+.tinder-feed.feed-details .feed-side {
+  grid-column: 5;
+  width: 28rem;
+  flex: 0 0 28rem;
+}
+
+.feed-side {
   display: flex;
-  min-height: calc(100vh - 9rem);
+  width: 28rem;
+  flex: 0 0 28rem;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem 2rem;
+  gap: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+  .tinder-feed,
+  .tinder-feed.feed-details {
+    grid-template-columns: min(24rem, 100%);
+    justify-content: center;
+    row-gap: 1rem;
+  }
+  .tinder-feed .tinder-stage,
+  .tinder-feed.feed-details .tinder-stage,
+  .tinder-feed.feed-details .feed-info-card,
+  .tinder-feed .feed-side {
+    grid-column: 1;
+    width: min(24rem, 100%);
+    min-width: 0;
+  }
+  .tinder-feed .tinder-deck,
+  .tinder-feed .tinder-card,
+  .tinder-feed.feed-details .tinder-deck,
+  .tinder-feed.feed-details .tinder-card,
+  .tinder-feed.feed-details .feed-info-card {
+    width: min(24rem, 100%);
+    min-width: 0;
+    height: min(36rem, 72vh);
+  }
+  .feed-side {
+    width: min(24rem, 100%);
+    flex-basis: auto;
+  }
+  .site-nav {
+    padding-inline: 0.4rem;
+  }
+  .nav-login {
+    padding-inline: 0.8rem;
+  }
+}
+
+.feed-rail {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.6rem;
+  background: linear-gradient(180deg, rgba(28, 22, 32, 0.95), rgba(14, 14, 18, 0.95));
+  padding: 1.25rem 1.3rem 1.4rem;
 }
 
 .tinder-stage {
-  display: flex;
-  width: 100%;
-  max-width: 56rem;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: center;
-  gap: 1cm;
+  display: block;
+  width: 24rem;
+  min-width: 24rem;
+  margin-right: 0;
 }
 
 .feed-info-card {
   display: flex;
-  height: 36rem;
+  height: 22rem;
   width: 100%;
-  max-width: 22rem;
+  max-width: none;
   flex-direction: column;
   overflow: hidden;
   border-radius: 2rem;
@@ -508,8 +605,8 @@ button:disabled,
 
 .tinder-deck {
   position: relative;
-  width: min(100%, 24rem);
-  height: 38rem;
+  width: 24rem;
+  height: 46rem;
 }
 
 .tinder-layer {
@@ -521,8 +618,8 @@ button:disabled,
 
 .tinder-card {
   position: relative;
-  width: min(100%, 22.5rem);
-  height: 36rem;
+  width: 100%;
+  height: 44rem;
   overflow: hidden;
   border-radius: 1.4rem;
   background: #111;
