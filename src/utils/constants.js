@@ -9,3 +9,7 @@ const deployedApi = (
 
 export const BASE_URL =
   window.location.hostname === "localhost" ? "http://localhost:7777" : deployedApi;
+
+export const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "906413381089-qm4m82gvie7gdu7r1qdr1faq8i5upqbu.apps.googleusercontent.com";

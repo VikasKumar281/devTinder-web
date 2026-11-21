@@ -13,6 +13,7 @@ const Contact = () => {
   const [message, setMessage] = useState("");
   const [topics, setTopics] = useState(fallbackTopics);
   const [sent, setSent] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,12 +35,13 @@ const Contact = () => {
     setError("");
     setSaving(true);
     try {
-      await axios.post(BASE_URL + "/support/contact", {
+      const res = await axios.post(BASE_URL + "/support/contact", {
         name: name.trim(),
         email: email.trim(),
         topic,
         message: message.trim(),
       });
+      setEmailSent(Boolean(res.data?.data?.emailSent));
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || "Could not save your message");
@@ -55,7 +57,12 @@ const Contact = () => {
         <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">{t("contactTitle")}</h1>
         <p className="mt-3 max-w-xl text-base leading-relaxed opacity-75">{t("contactText")}</p>
         <p className="mt-3 max-w-xl text-sm leading-relaxed opacity-60">
-          Every message is saved in MongoDB with your name, email, topic, and the full text so the DevTinder team can follow up. Do not include passwords.
+          Every message is saved in MongoDB and emailed to
+          {" "}
+          <a className="font-semibold text-rose-300" href="mailto:vikaskumar280204@gmail.com">
+            vikaskumar280204@gmail.com
+          </a>
+          . Do not include passwords.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -78,7 +85,11 @@ const Contact = () => {
           <div className="rounded-[2rem] border border-emerald-400/20 bg-emerald-500/10 p-8">
             <p className="text-2xl font-bold text-emerald-200">Thanks, {name.trim()}.</p>
             <p className="mt-3 text-sm leading-relaxed text-emerald-100/80">{t("sent")}</p>
-            <p className="mt-2 text-sm opacity-70">Your ticket is stored and marked as new.</p>
+            <p className="mt-2 text-sm opacity-70">
+              {emailSent
+                ? "Check your inbox (and spam). The first email may ask you to confirm the sender, then the message arrives."
+                : "Your ticket is stored. Email could not be delivered yet — check spam or try again."}
+            </p>
           </div>
         ) : (
           <form

@@ -107,25 +107,34 @@ const NavBar = () => {
     }
   };
 
+  const linkClass = (path) =>
+    "nav-link hidden sm:inline-flex " + (location.pathname === path ? "nav-link-active" : "");
+
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl">
-      <div className="flex h-[4.25rem] w-full items-center justify-between gap-3 px-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur-2xl">
+      <div className="mx-auto flex h-[4.4rem] w-full max-w-[90rem] items-center justify-between gap-3 px-3 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link
             to={user ? "/feed" : "/"}
-            className="flex shrink-0 items-center gap-2.5 px-1 text-lg font-extrabold tracking-tight"
+            className="flex shrink-0 items-center gap-2.5 px-1 text-[1.05rem] font-extrabold tracking-tight"
           >
-            <BrandLogo size="md" className="rounded-lg" />
+            <BrandLogo size="md" className="rounded-[0.9rem] ring-1 ring-white/15" />
             <span className="hidden sm:inline">DevTinder</span>
           </Link>
           {user && (
-            <div className="relative w-[min(22rem,42vw)]">
-              <input
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder={t("search")}
-                className="input input-sm h-10 w-full rounded-full border-white/10 bg-white/5 px-4"
-              />
+            <div className="relative w-[min(18rem,38vw)]">
+              <label className="search-shell">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 opacity-50" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3-3" />
+                </svg>
+                <input
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder={t("search")}
+                  className="h-full w-full bg-transparent text-sm outline-none placeholder:opacity-50"
+                />
+              </label>
               {searchText.trim() && (
                 <div className="absolute left-0 right-0 top-12 z-30 max-h-80 overflow-auto rounded-2xl border border-white/10 bg-neutral-950 p-2 shadow-2xl">
                   {searchResults.length === 0 ? (
@@ -162,12 +171,12 @@ const NavBar = () => {
           )}
         </div>
 
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
           <LanguageMenu />
-          <Link to="/support" className="nav-link hidden sm:inline-flex">
+          <Link to="/support" className={linkClass("/support")}>
             {t("support")}
           </Link>
-          <Link to="/contact" className="nav-link hidden sm:inline-flex">
+          <Link to="/contact" className={linkClass("/contact")}>
             {t("contact")}
           </Link>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
@@ -6,6 +6,7 @@ import { clearFeed } from "../utils/feedSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import BrandLogo from "./BrandLogo";
+import GoogleAuthButton from "./GoogleAuthButton";
 import { useI18n } from "../utils/i18n";
 
 const passwordChecks = (password) => [
@@ -32,9 +33,18 @@ const Login = () => {
   const checks = passwordChecks(password);
 
   const switchMode = (loginMode) => {
-    setIsLoginForm(loginMode);
     setError("");
+    setIsLoginForm(loginMode);
   };
+
+  const finishGoogle = useCallback(
+    (user) => {
+      dispatch(clearFeed());
+      dispatch(addUser(user));
+      navigate("/feed");
+    },
+    [dispatch, navigate]
+  );
 
   const handleLogin = async () => {
     setError("");
@@ -141,21 +151,36 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 rounded-full bg-black/25 p-1">
+          <div className="auth-tab mb-6 grid grid-cols-2 rounded-full bg-black/25 p-1">
+            <span
+              className="auth-tab-pill"
+              style={{ transform: isLoginForm ? "translateX(0.25rem)" : "translateX(calc(100% + 0.25rem))" }}
+            />
             <button
               type="button"
-              className={`rounded-full py-2.5 text-sm font-semibold ${isLoginForm ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30" : "opacity-70"}`}
+              className={`relative z-10 rounded-full py-2.5 text-sm font-semibold ${isLoginForm ? "text-white" : "opacity-70"}`}
               onClick={() => switchMode(true)}
             >
               {t("signIn")}
             </button>
             <button
               type="button"
-              className={`rounded-full py-2.5 text-sm font-semibold ${!isLoginForm ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30" : "opacity-70"}`}
+              className={`relative z-10 rounded-full py-2.5 text-sm font-semibold ${!isLoginForm ? "text-white" : "opacity-70"}`}
               onClick={() => switchMode(false)}
             >
               {t("signUp")}
             </button>
+          </div>
+
+          <GoogleAuthButton
+            disabled={loading}
+            onSuccess={finishGoogle}
+            onError={setError}
+          />
+          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.18em] opacity-40">
+            <span className="h-px flex-1 bg-white/15" />
+            or
+            <span className="h-px flex-1 bg-white/15" />
           </div>
 
           <div
@@ -164,30 +189,32 @@ const Login = () => {
               if (event.key === "Enter") submit();
             }}
           >
-            {!isLoginForm && (
-              <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                  {t("firstName")}
-                  <input
-                    type="text"
-                    value={firstName}
-                    placeholder="Aarav"
-                    className="input input-bordered auth-input w-full"
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </label>
-                <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
-                  {t("lastName")}
-                  <input
-                    type="text"
-                    value={lastName}
-                    placeholder="Mehta"
-                    className="input input-bordered auth-input w-full"
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </label>
+            <div className={"auth-reveal " + (!isLoginForm ? "open" : "")}>
+              <div className="auth-reveal-inner">
+                <div className="grid grid-cols-2 gap-3 pb-1">
+                  <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+                    {t("firstName")}
+                    <input
+                      type="text"
+                      value={firstName}
+                      placeholder="Aarav"
+                      className="input input-bordered auth-input w-full"
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
+                    {t("lastName")}
+                    <input
+                      type="text"
+                      value={lastName}
+                      placeholder="Mehta"
+                      className="input input-bordered auth-input w-full"
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </label>
+                </div>
               </div>
-            )}
+            </div>
 
             <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wide opacity-70">
               {t("email")}
@@ -220,15 +247,17 @@ const Login = () => {
               </div>
             </label>
 
-            {!isLoginForm && (
-              <ul className="grid grid-cols-1 gap-1.5 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs">
-                {checks.map((check) => (
-                  <li key={check.label} className={check.ok ? "text-emerald-400" : "opacity-55"}>
-                    {check.ok ? "✓" : "○"} {check.label}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className={"auth-reveal " + (!isLoginForm ? "open" : "")}>
+              <div className="auth-reveal-inner">
+                <ul className="grid grid-cols-1 gap-1.5 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs">
+                  {checks.map((check) => (
+                    <li key={check.label} className={check.ok ? "text-emerald-400" : "opacity-55"}>
+                      {check.ok ? "✓" : "○"} {check.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
 
             {error && (
               <p className="rounded-2xl border border-rose-400/20 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">
