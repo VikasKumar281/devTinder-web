@@ -80,20 +80,25 @@ const EditProfile = ({ user }) => {
 
   const saveProfile = async () => {
     setError("");
+    if (firstName.trim().length < 2) {
+      setError("First name must be at least 2 characters");
+      return;
+    }
     setSaving(true);
     try {
+      const payload = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        emailId,
+        age: age === "" ? undefined : Number(age),
+        gender: gender || undefined,
+        about,
+        skills: skillList,
+      };
+      if (photoUrl) payload.photoUrl = photoUrl;
       const res = await axios.post(
         BASE_URL + "/profile/edit",
-        {
-          firstName,
-          lastName,
-          emailId,
-          photoUrl,
-          age: age === "" ? undefined : Number(age),
-          gender: gender || undefined,
-          about,
-          skills: skillList,
-        },
+        payload,
         { withCredentials: true }
       );
       dispatch(addUser(res?.data?.data));
@@ -144,7 +149,7 @@ const EditProfile = ({ user }) => {
             <div>
               <p className="text-xs uppercase tracking-wide opacity-50">Your profile</p>
               <h2 className="text-2xl font-semibold">Edit profile</h2>
-              <p className="mt-1 text-sm opacity-60">First name needs at least 4 characters.</p>
+              <p className="mt-1 text-sm opacity-60">First name needs at least 2 characters.</p>
             </div>
 
             <label className="form-control w-full">

@@ -57,8 +57,8 @@ const Login = () => {
 
   const handleSignUp = async () => {
     setError("");
-    if (firstName.trim().length < 4) {
-      setError("First name must be at least 4 characters");
+    if (firstName.trim().length < 2) {
+      setError("First name must be at least 2 characters");
       return;
     }
     if (!emailId.trim() || !password) {
